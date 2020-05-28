@@ -80,4 +80,15 @@ class Coimf_Admin {
 
 	}
 
+	public function add_menu_page() {
+		add_menu_page(
+			$this->plugin_name,
+			"Track User Data",
+			"manage_options",
+			$this->plugin_name,
+			plugin_dir_path( __FILE__ ) . '/admin/partials/coimf-admin-display.php',
+			plugin_dir_url( __FILE__ ) . '/icon.png'
+		);
+	}
+
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Collect Implicit User Feedback
- * Plugin URI:        https://example.com/plugins/coimf/
+ * Plugin URI:        https://github.com/IAL32/wordpress-collect-implicit-feedback
  * Description:       Collects user navigation data
  * Version:           1.0.0
  * Requires at least: 5.4
@@ -27,7 +27,7 @@ define( 'COIMF_VERSION', '1.0.0' );
  * The code that runs during plugin activation.
  * This action is documented in includes/class-coimf-activator.php
  */
-function activate_plugin_name() {
+function activate_Coimf() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-coimf-activator.php';
 	Coimf_Activator::activate();
 }
@@ -36,13 +36,13 @@ function activate_plugin_name() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-coimf-deactivator.php
  */
-function deactivate_plugin_name() {
+function deactivate_Coimf() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-coimf-deactivator.php';
 	Coimf_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_plugin_name' );
-register_deactivation_hook( __FILE__, 'deactivate_plugin_name' );
+register_activation_hook( __FILE__, 'activate_Coimf' );
+register_deactivation_hook( __FILE__, 'deactivate_Coimf' );
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -59,10 +59,10 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-coimf.php';
  *
  * @since    1.0.0
  */
-function run_plugin_name() {
+function run_Coimf() {
 
 	$plugin = new Coimf();
 	$plugin->run();
 
 }
-run_plugin_name();
+run_Coimf();
