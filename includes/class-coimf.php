@@ -8,27 +8,27 @@ class Coimf {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Coimf_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Coimf_Loader    $mLoader    Maintains and registers all hooks for the plugin.
 	 */
-	protected $loader;
+	protected $mLoader;
 
 	/**
 	 * The unique identifier of this plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $Coimf    The string used to uniquely identify this plugin.
+	 * @var      string    $mCoimf    The string used to uniquely identify this plugin.
 	 */
-	protected $Coimf;
+	protected $mCoimf;
 
 	/**
 	 * The current version of the plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      string    $version    The current version of the plugin.
+	 * @var      string    $mVersion    The current version of the plugin.
 	 */
-	protected $version;
+	protected $mVersion;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -41,15 +41,15 @@ class Coimf {
 	 */
 	public function __construct() {
 		if ( defined( 'COIMF_VERSION' ) ) {
-			$this->version = COIMF_VERSION;
+			$this->mVersion = COIMF_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->mVersion = '1.0.0';
 		}
-		$this->Coimf = 'coimf';
+		$this->mCoimf = 'coimf';
 
-		$this->load_dependencies();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
+		$this->loadDependencies();
+		$this->defineAdminHooks();
+		$this->definePublicHooks();
 
 	}
 
@@ -69,7 +69,7 @@ class Coimf {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function loadDependencies() {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-db.php';
 
@@ -96,7 +96,7 @@ class Coimf {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-coimf-public.php';
 
-		$this->loader = new Coimf_Loader();
+		$this->mLoader = new Coimf_Loader();
 
 	}
 
@@ -107,13 +107,13 @@ class Coimf {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function defineAdminHooks() {
 
-		$plugin_admin = new Coimf_Admin( $this->get_Coimf(), $this->get_version() );
+		$vPluginAdmin = new Coimf_Admin( $this->getCoimf(), $this->getVersion() );
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_menu_page' );
+		$this->mLoader->addAction( 'admin_enqueue_scripts', $vPluginAdmin, 'enqueueStyles' );
+		$this->mLoader->addAction( 'admin_enqueue_scripts', $vPluginAdmin, 'enqueueScripts' );
+		$this->mLoader->addAction( 'admin_menu', $vPluginAdmin, 'addMenuPage' );
 
 	}
 
@@ -124,12 +124,12 @@ class Coimf {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function definePublicHooks() {
 
-		$plugin_public = new Coimf_Public( $this->get_Coimf(), $this->get_version() );
+		$vPluginPublic = new Coimf_Public( $this->getCoimf(), $this->getVersion() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->mLoader->addAction( 'wp_enqueue_scripts', $vPluginPublic, 'enqueueStyles' );
+		$this->mLoader->addAction( 'wp_enqueue_scripts', $vPluginPublic, 'enqueueScripts' );
 
 	}
 
@@ -139,7 +139,7 @@ class Coimf {
 	 * @since    1.0.0
 	 */
 	public function run() {
-		$this->loader->run();
+		$this->mLoader->run();
 	}
 
 	/**
@@ -149,8 +149,8 @@ class Coimf {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_Coimf() {
-		return $this->Coimf;
+	public function getCoimf() {
+		return $this->mCoimf;
 	}
 
 	/**
@@ -159,8 +159,8 @@ class Coimf {
 	 * @since     1.0.0
 	 * @return    Coimf_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
-		return $this->loader;
+	public function getLoader() {
+		return $this->mLoader;
 	}
 
 	/**
@@ -169,7 +169,7 @@ class Coimf {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function getVersion() {
 		return $this->version;
 	}
 

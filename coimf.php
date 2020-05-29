@@ -17,6 +17,11 @@
 defined( 'WPINC' ) || die;
 
 /**
+ * In the debug status, the plugin will not make any permanent changes.
+ */
+define( 'COIMF_DEBUG', true );
+
+/**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
@@ -61,8 +66,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-coimf.php';
  */
 function run_Coimf() {
 
-	$plugin = new Coimf();
-	$plugin->run();
+	$vPlugin = new Coimf();
+	$vPlugin->run();
 
 }
 run_Coimf();

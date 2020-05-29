@@ -1,11 +1,9 @@
 <?php
-class Coimf_DB {
-    public static $cTablePrefix = 'coimf_';
-    public static $cDataTableName = 'Data';
 
-    private static $mInstance = null;
-    
-    private function __construct() {
+class Comf_Tracker {
+    protected static $mInstance;
+
+    public function __construct() {
         if (self::$mInstance) {
             return self::$mInstance;
         }
@@ -15,6 +13,7 @@ class Coimf_DB {
         if (self::$mInstance) {
             return self::$mInstance;
         }
-        return new Coimf_DB();
+
+        return new Comf_Tracker();
     }
 }

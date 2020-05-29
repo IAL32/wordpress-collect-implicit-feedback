@@ -7,18 +7,18 @@ class Coimf_Loader {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      array    $actions    The actions registered with WordPress to fire when the plugin loads.
+	 * @var      array    $mActions    The actions registered with WordPress to fire when the plugin loads.
 	 */
-	protected $actions;
+	protected $mActions;
 
 	/**
 	 * The array of filters registered with WordPress.
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      array    $filters    The filters registered with WordPress to fire when the plugin loads.
+	 * @var      array    $mFilters    The filters registered with WordPress to fire when the plugin loads.
 	 */
-	protected $filters;
+	protected $mFilters;
 
 	/**
 	 * Initialize the collections used to maintain the actions and filters.
@@ -27,8 +27,8 @@ class Coimf_Loader {
 	 */
 	public function __construct() {
 
-		$this->actions = array();
-		$this->filters = array();
+		$this->mActions = array();
+		$this->mFilters = array();
 
 	}
 
@@ -36,28 +36,28 @@ class Coimf_Loader {
 	 * Add a new action to the collection to be registered with WordPress.
 	 *
 	 * @since    1.0.0
-	 * @param    string               $hook             The name of the WordPress action that is being registered.
-	 * @param    object               $component        A reference to the instance of the object on which the action is defined.
-	 * @param    string               $callback         The name of the function definition on the $component.
-	 * @param    int                  $priority         Optional. The priority at which the function should be fired. Default is 10.
-	 * @param    int                  $accepted_args    Optional. The number of arguments that should be passed to the $callback. Default is 1.
+	 * @param    string               $aHook             The name of the WordPress action that is being registered.
+	 * @param    object               $aComponent        A reference to the instance of the object on which the action is defined.
+	 * @param    string               $aCallback         The name of the function definition on the $component.
+	 * @param    int                  $aPriority         Optional. The priority at which the function should be fired. Default is 10.
+	 * @param    int                  $aAcceptedArgs    Optional. The number of arguments that should be passed to the $callback. Default is 1.
 	 */
-	public function add_action( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
-		$this->actions = $this->add( $this->actions, $hook, $component, $callback, $priority, $accepted_args );
+	public function addAction( $aHook, $aComponent, $aCallback, $aPriority = 10, $aAcceptedArgs = 1 ) {
+		$this->mActions = $this->add( $this->mActions, $aHook, $aComponent, $aCallback, $aPriority, $aAcceptedArgs );
 	}
 
 	/**
 	 * Add a new filter to the collection to be registered with WordPress.
 	 *
 	 * @since    1.0.0
-	 * @param    string               $hook             The name of the WordPress filter that is being registered.
-	 * @param    object               $component        A reference to the instance of the object on which the filter is defined.
-	 * @param    string               $callback         The name of the function definition on the $component.
-	 * @param    int                  $priority         Optional. The priority at which the function should be fired. Default is 10.
-	 * @param    int                  $accepted_args    Optional. The number of arguments that should be passed to the $callback. Default is 1
+	 * @param    string               $aHook             The name of the WordPress filter that is being registered.
+	 * @param    object               $aComponent        A reference to the instance of the object on which the filter is defined.
+	 * @param    string               $aCallback         The name of the function definition on the $component.
+	 * @param    int                  $aPriority         Optional. The priority at which the function should be fired. Default is 10.
+	 * @param    int                  $aAcceptedArgs    Optional. The number of arguments that should be passed to the $callback. Default is 1
 	 */
-	public function add_filter( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
-		$this->filters = $this->add( $this->filters, $hook, $component, $callback, $priority, $accepted_args );
+	public function addFilter( $aHook, $aComponent, $aCallback, $aPriority = 10, $aAcceptedArgs = 1 ) {
+		$this->mFilters = $this->add( $this->mFilters, $aHook, $aComponent, $aCallback, $aPriority, $aAcceptedArgs );
 	}
 
 	/**
@@ -66,25 +66,25 @@ class Coimf_Loader {
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @param    array                $hooks            The collection of hooks that is being registered (that is, actions or filters).
-	 * @param    string               $hook             The name of the WordPress filter that is being registered.
-	 * @param    object               $component        A reference to the instance of the object on which the filter is defined.
-	 * @param    string               $callback         The name of the function definition on the $component.
-	 * @param    int                  $priority         The priority at which the function should be fired.
-	 * @param    int                  $accepted_args    The number of arguments that should be passed to the $callback.
+	 * @param    array                $aHooks            The collection of hooks that is being registered (that is, actions or filters).
+	 * @param    string               $aHook             The name of the WordPress filter that is being registered.
+	 * @param    object               $aComponent        A reference to the instance of the object on which the filter is defined.
+	 * @param    string               $aCallback         The name of the function definition on the $component.
+	 * @param    int                  $aPriority         The priority at which the function should be fired.
+	 * @param    int                  $aAcceptedArgs    The number of arguments that should be passed to the $callback.
 	 * @return   array                                  The collection of actions and filters registered with WordPress.
 	 */
-	private function add( $hooks, $hook, $component, $callback, $priority, $accepted_args ) {
+	private function add( $aHooks, $aHook, $aComponent, $aCallback, $aPriority, $aAcceptedArgs ) {
 
-		$hooks[] = array(
-			'hook'          => $hook,
-			'component'     => $component,
-			'callback'      => $callback,
-			'priority'      => $priority,
-			'accepted_args' => $accepted_args
+		$aHooks[] = array(
+			'hook'          => $aHook,
+			'component'     => $aComponent,
+			'callback'      => $aCallback,
+			'priority'      => $aPriority,
+			'accepted_args' => $aAcceptedArgs
 		);
 
-		return $hooks;
+		return $aHooks;
 
 	}
 
@@ -95,12 +95,12 @@ class Coimf_Loader {
 	 */
 	public function run() {
 
-		foreach ( $this->filters as $hook ) {
-			add_filter( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
+		foreach ( $this->mFilters as $vHook ) {
+			add_filter( $vHook['hook'], array( $vHook['component'], $vHook['callback'] ), $vHook['priority'], $vHook['accepted_args'] );
 		}
 
-		foreach ( $this->actions as $hook ) {
-			add_action( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
+		foreach ( $this->mActions as $vHook ) {
+			add_action( $vHook['hook'], array( $vHook['component'], $vHook['callback'] ), $vHook['priority'], $vHook['accepted_args'] );
 		}
 
 	}
