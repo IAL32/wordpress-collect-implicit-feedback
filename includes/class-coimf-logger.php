@@ -1,6 +1,9 @@
 <?php
 
 class Coimf_Logger {
+
+// Public
+
     /**
      * @param integer $aLevel Describes the level of verbosity of this logger instance
      */
@@ -24,13 +27,37 @@ class Coimf_Logger {
         $this->writeLineToFileAndClose( $vHandle, $vLogLine );
     }
 
-    public function setLogFileTimestampFormat( $aTimestampFormat ) {
-        $this->mLogFileTimestampFormat = $aTimestampFormat;
+// Getters and setters
+
+    public function setLogFileFormat( $aLogFileFormat ) {
+        $this->mLogFileFormat = $aLogFileFormat;
     }
 
     public function setLogFileExtension( $aLogFileExtension ) {
         $this->mLogFileExtension = $aLogFileExtension;
     }
+
+    public function setLogFileTimestampFormat( $aTimestampFormat ) {
+        $this->mLogFileTimestampFormat = $aTimestampFormat;
+    }
+    
+    public function setLogLineFormat( $aLogLineFormat ) {
+        $this->mLogLineFormat = $aLogLineFormat;
+    }
+
+    public function setLogLineTImestampFormat( $aLogLineTimestampFormat ) {
+        $this->mLogLineTimestampFormat = $aLogLineTimestampFormat;
+    }
+
+    public function setLogLineMessagesImplodeGlue( $aLogLineMessagesImplodeGlue ) {
+        $this->mLogLineMessagesImplodeGlue = $aLogLineMessagesImplodeGlue;
+    }
+
+    public function setLogLineEndLine( $aLogLineEndLine ) {
+        $this->mLogLineEndLine = $aLogLineEndLine;
+    }
+
+// Private
 
     /**
      * This function will take an indefinite amount of arguments and will
@@ -100,7 +127,7 @@ class Coimf_Logger {
      * %1$s is the filename, no extension
      * %2$s the second is the file extension
      */
-    private $mLogFileFormat = "%s.%s";
+    private $mLogFileFormat = '%1$s.%2s$s';
 
     /** The extension of the file */
     private $mLogFileExtension = ".log";
@@ -123,10 +150,16 @@ class Coimf_Logger {
      */
     private $mLogLineFormat = '[%1$s] %2$d %3$s';
 
+    /** The timestamp that is going to be shown on each log line */
     private $mLogLineTimestampFormat = "d/m/y,H:i:s";
 
+    /**
+     * How each parameter is going to be glued to each other when multiple
+     * values are being passed to the debuggerss
+    */
     private $mLogLineMessagesImplodeGlue = " ";
 
+    /** End line character for each log line */
     private $mLogLineEndLine = "\n";
 
     /** The current timestamp */

@@ -30,6 +30,8 @@ class Coimf {
 	 */
 	protected $mVersion;
 
+	protected $mDB;
+
 	/**
 	 * Define the core functionality of the plugin.
 	 *
@@ -48,6 +50,7 @@ class Coimf {
 		$this->mCoimf = 'coimf';
 
 		$this->loadDependencies();
+		$this->defineCoimfHooks();
 		$this->defineAdminHooks();
 		$this->definePublicHooks();
 
@@ -71,19 +74,17 @@ class Coimf {
 	 */
 	private function loadDependencies() {
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-activator.php';
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-action.php';
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-db.php';
 
-		/**
-		 * The class responsible for orchestrating the actions and filters of the
-		 * core plugin.
-		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-deactivator.php';
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-loader.php';
 
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-logger.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -97,6 +98,12 @@ class Coimf {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-coimf-public.php';
 
 		$this->mLoader = new Coimf_Loader();
+
+	}
+
+	private function defineCoimfHooks() {
+
+		$this->mDB = Coimf_DB::get_instance();
 
 	}
 

@@ -7,15 +7,17 @@ class Coimf_Activator {
 	}
 
 	private static function createDataTable() {
-		global $wpdb;
-		$vTableName = $wpdb->prefix . Coimf_DB::$cTablePrefix . Coimf_DB::$cDataTableName;
-		if($wpdb->get_var( "show tables like '{$vTableName}'" ) != $vTableName) {
+		$vDB = Coimf_DB::get_instance();
+
+		$vTableName = $vDB->getDataTableName();
+		if( $vDB->get_var( "show tables like '{$vTableName}'" ) != $vTableName ) {
 			$sql = "CREATE TABLE {$vTableName}
 			( id         int NOT NULL GENERATED ALWAYS AS IDENTITY ( minvalue 1 start 1 ),
 			 user_id     int NOT NULL,
 			 action_type int NOT NULL,
 			 value       text NOT NULL,
-			 timestamp   time with time zone NOT NULL,
+			 time_start   time with time zone NOT NULL,
+			 time_end   time with time zone NOT NULL,
 			 CONSTRAINT PK_{$vTableName} PRIMARY KEY ( id )
 			);";
 			require_once( ABSPATH . '/wp-admin/includes/upgrade.php' );
