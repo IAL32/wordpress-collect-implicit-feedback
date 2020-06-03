@@ -53,7 +53,7 @@ class Coimf_Admin {
 		 * class.
 		 */
 
-		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . 'css/coimf-admin.css', array(), $this->mVersion, 'all' );
+		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . "css/coimf-admin.css", array(), $this->mVersion, "all" );
 
 	}
 
@@ -76,7 +76,7 @@ class Coimf_Admin {
 		 * class.
 		 */
 
-		// wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . 'js/coimf-admin.js', array( 'jquery' ), $this->mVersion, false );
+		// wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . "js/coimf-admin.js", array( "jquery" ), $this->mVersion, false );
 
 	}
 
@@ -86,8 +86,8 @@ class Coimf_Admin {
 			"Track User Data",
 			"manage_options",
 			$this->mPluginName,
-			plugin_dir_path( __FILE__ ) . '/admin/partials/coimf-admin-display.php',
-			plugin_dir_url( __FILE__ ) . '/icon.png'
+			plugin_dir_path( __FILE__ ) . "/admin/partials/coimf-admin-display.php",
+			plugin_dir_url( __FILE__ ) . "/icon.png"
 		);
 	}
 

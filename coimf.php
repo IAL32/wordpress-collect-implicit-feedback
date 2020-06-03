@@ -14,26 +14,28 @@
  * Domain Path:       /languages
  */
 
-defined( 'WPINC' ) || die;
+defined( "WPINC" ) || die;
 
 /**
  * In the debug status, the plugin will not make any permanent changes.
  */
-define( 'COIMF_DEBUG', true );
+define( "COIMF_DEBUG", true );
 
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'COIMF_VERSION', '1.0.0' );
+define( "COIMF_VERSION", "1.0.0" );
+
+define( "COIMF_API_VERSION", "v1" );
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-coimf-activator.php
  */
 function activate_Coimf() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-coimf-activator.php';
+	require_once plugin_dir_path( __FILE__ ) . "includes/class-coimf-activator.php";
 	Coimf_Activator::activate();
 }
 
@@ -42,18 +44,18 @@ function activate_Coimf() {
  * This action is documented in includes/class-coimf-deactivator.php
  */
 function deactivate_Coimf() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-coimf-deactivator.php';
+	require_once plugin_dir_path( __FILE__ ) . "includes/class-coimf-deactivator.php";
 	Coimf_Deactivator::deactivate();
 }
 
-register_activation_hook( __FILE__, 'activate_Coimf' );
-register_deactivation_hook( __FILE__, 'deactivate_Coimf' );
+register_activation_hook( __FILE__, "activate_Coimf" );
+register_deactivation_hook( __FILE__, "deactivate_Coimf" );
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-coimf.php';
+require plugin_dir_path( __FILE__ ) . "includes/class-coimf.php";
 
 /**
  * Begins execution of the plugin.

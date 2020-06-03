@@ -27,10 +27,10 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+if ( ! defined( "WP_UNINSTALL_PLUGIN" ) ) {
 	exit;
 }
 
-include_once dirname( __FILE__ ) . '/includes/class-coimf-activator.php';
+include_once dirname( __FILE__ ) . "/includes/class-coimf-activator.php";
 
 Coimf_Activator::drop_tables();

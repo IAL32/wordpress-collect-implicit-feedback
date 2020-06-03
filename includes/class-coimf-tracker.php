@@ -9,7 +9,7 @@ class Comf_Tracker {
         }
     }
 
-    public static function get_instance() {
+    public static function getInstance() {
         if (self::$mInstance) {
             return self::$mInstance;
         }

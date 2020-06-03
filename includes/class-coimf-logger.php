@@ -8,7 +8,7 @@ class Coimf_Logger {
      * @param integer $aLevel Describes the level of verbosity of this logger instance
      */
     public function __construct( $aLogGroup, $aTime = false ) {
-        $this->mLogDirectory = wp_get_upload_dir() . '/' . $aLogGroup;
+        $this->mLogDirectory = wp_get_upload_dir() . "/" . $aLogGroup;
         if ( !$aTime ) {
             $this->mTime = time();
         } else {
@@ -127,7 +127,7 @@ class Coimf_Logger {
      * %1$s is the filename, no extension
      * %2$s the second is the file extension
      */
-    private $mLogFileFormat = '%1$s.%2s$s';
+    private $mLogFileFormat = "%1\$s.%2s\$s";
 
     /** The extension of the file */
     private $mLogFileExtension = ".log";
@@ -148,7 +148,7 @@ class Coimf_Logger {
      * %2$d is the log level
      * %3$s is log text
      */
-    private $mLogLineFormat = '[%1$s] %2$d %3$s';
+    private $mLogLineFormat = "[%1\$s] %2\$d %3\$s";
 
     /** The timestamp that is going to be shown on each log line */
     private $mLogLineTimestampFormat = "d/m/y,H:i:s";

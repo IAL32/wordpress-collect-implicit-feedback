@@ -3,7 +3,7 @@
 class Coimf {
 
 	/**
-	 * The loader that's responsible for maintaining and registering all hooks that power
+	 * The loader that"s responsible for maintaining and registering all hooks that power
 	 * the plugin.
 	 *
 	 * @since    1.0.0
@@ -30,6 +30,8 @@ class Coimf {
 	 */
 	protected $mVersion;
 
+	protected $mAPIVersion;
+
 	protected $mDB;
 
 	/**
@@ -42,15 +44,21 @@ class Coimf {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'COIMF_VERSION' ) ) {
+		if ( defined( "COIMF_VERSION" ) ) {
 			$this->mVersion = COIMF_VERSION;
 		} else {
-			$this->mVersion = '1.0.0';
+			$this->mVersion = "1.0.0";
 		}
-		$this->mCoimf = 'coimf';
+
+		if ( defined( "COIMF_API_VERSION" ) ) {
+			$this->mAPIVersion = COIMF_API_VERSION;
+		} else {
+			$this->mAPIVersion = "v1";
+		}
+
+		$this->mCoimf = "coimf";
 
 		$this->loadDependencies();
-		$this->defineCoimfHooks();
 		$this->defineAdminHooks();
 		$this->definePublicHooks();
 
@@ -74,36 +82,36 @@ class Coimf {
 	 */
 	private function loadDependencies() {
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-activator.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-activator.php";
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-action.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-action.php";
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-db.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-cookie.php";
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-deactivator.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-db.php";
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-deactivator.php";
 
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-coimf-logger.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-enum.php";
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-loader.php";
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-logger.php";
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-coimf-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "admin/class-coimf-admin.php";
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-coimf-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "public/class-coimf-public.php";
 
 		$this->mLoader = new Coimf_Loader();
-
-	}
-
-	private function defineCoimfHooks() {
-
-		$this->mDB = Coimf_DB::get_instance();
+		$this->mAction = new Coimf_Action( $this->mCoimf, $this->mAPIVersion );
+		$this->mDB = Coimf_DB::getInstance();
 
 	}
 
@@ -118,9 +126,9 @@ class Coimf {
 
 		$vPluginAdmin = new Coimf_Admin( $this->getCoimf(), $this->getVersion() );
 
-		$this->mLoader->addAction( 'admin_enqueue_scripts', $vPluginAdmin, 'enqueueStyles' );
-		$this->mLoader->addAction( 'admin_enqueue_scripts', $vPluginAdmin, 'enqueueScripts' );
-		$this->mLoader->addAction( 'admin_menu', $vPluginAdmin, 'addMenuPage' );
+		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueStyles" );
+		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueScripts" );
+		$this->mLoader->addAction( "admin_menu", $vPluginAdmin, "addMenuPage" );
 
 	}
 
@@ -135,8 +143,9 @@ class Coimf {
 
 		$vPluginPublic = new Coimf_Public( $this->getCoimf(), $this->getVersion() );
 
-		$this->mLoader->addAction( 'wp_enqueue_scripts', $vPluginPublic, 'enqueueStyles' );
-		$this->mLoader->addAction( 'wp_enqueue_scripts', $vPluginPublic, 'enqueueScripts' );
+		$this->mLoader->addAction( "init", $vPluginPublic, "handleSession" );
+		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueStyles" );
+		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueScripts" );
 
 	}
 

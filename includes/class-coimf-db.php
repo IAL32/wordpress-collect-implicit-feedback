@@ -8,10 +8,10 @@ class Coimf_DB {
 
     public $mPrefix;
 
-    public static $cTablePrefix = 'coimf_';
-    public static $cDataTableName = 'Actions';
+    public static $cTablePrefix = "coimf_";
+    public static $cDataTableName = "Actions";
 
-    public static function get_instance() {
+    public static function getInstance() {
         if (self::$mInstance) {
             return self::$mInstance;
         }
@@ -47,7 +47,7 @@ class Coimf_DB {
     }
 
 // Private
-    
+
     private function __construct() {
         if (self::$mInstance) {
             return self::$mInstance;

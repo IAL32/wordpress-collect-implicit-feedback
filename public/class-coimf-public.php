@@ -20,6 +20,8 @@ class Coimf_Public {
 	 */
 	private $mVersion;
 
+	private $mCookie;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -31,7 +33,12 @@ class Coimf_Public {
 
 		$this->mPluginName = $aPluginName;
 		$this->mVersion = $aVersion;
+		$this->mCookie = Coimf_Cookie::getCookie();
 
+	}
+
+	public function handleSessionStart() {
+		$this->refererAction();
 	}
 
 	/**
@@ -53,7 +60,7 @@ class Coimf_Public {
 		 * class.
 		 */
 
-		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . 'css/coimf-public.css', array(), $this->mVersion, 'all' );
+		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . "css/coimf-public.css", array(), $this->mVersion, "all" );
 
 	}
 
@@ -76,8 +83,19 @@ class Coimf_Public {
 		 * class.
 		 */
 
-		// wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . 'js/coimf-public.js', array( 'jquery' ), $this->mVersion, false );
+		// wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . "js/coimf-public.js", array( "jquery" ), $this->mVersion, false );
 
+	}
+
+	private function refererAction() : void {
+		global $wp;
+		$vHTTPReferer = wp_get_referer();
+		if ( !$vHTTPReferer ) {
+			return;
+		}
+
+		$vCurrentURL = home_url( $wp->request );
+		Coimf_Action::addInternalLinkAction( $this->mCookie->getGUID(), $vHTTPReferer, $vCurrentURL, time() );
 	}
 
 }
