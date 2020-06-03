@@ -8,9 +8,39 @@ abstract class Coimf_Action_Type extends Coimf_Enum {
 
 class Coimf_Action {
 
-    public function __construct( string $aPluginName, string $aAPIVersion ) {
+    public function __construct( string $aPluginName ) {
         $this->mPluginName = $aPluginName;
-        $this->mAPIVersion = $aAPIVersion;
+    }
+
+    public function registerEndpoint() : void {
+        register_rest_route(
+            $this->mPluginName . "/" . self::cAPIVersion,
+            "/track/(?P<mouseX>\d+),(?P<mouseY>\d+)",
+            [
+                "methods" => WP_REST_Server::CREATABLE,
+                "callback" => [ $this, "addClickPositionCallback" ]
+            ]
+        );
+    }
+
+    public function addClickPositionCallback( WP_REST_Request $aRequest ) {
+        if ( is_admin() ) {
+            return new WP_REST_Response( [ "message" => "Not logging admin clicks" ], 200 );
+        }
+
+        $vMouseX = $aRequest->get_param( "mouseX" );
+        $vMouseY = $aRequest->get_param( "mouseY" );
+        $vPageLocation = $aRequest->get_param( "pageLocation" );
+
+        if ( $vMouseX < 0 || $vMouseY < 0 ) {
+            return new WP_Error( "Coimf_Action::addClickPositionCallback()", "Mouse position not valid" );
+        }
+
+        $vCookie = Coimf_Cookie::getCookie();
+
+        self::addClickPosition( $vCookie->getGUID(), $vMouseX, $vMouseY, $vPageLocation , time() );
+
+        return new WP_REST_Response( [ "message" => "Click logged" ], 200 );
     }
 
     public static function getAction( $aActionID ) {
@@ -121,6 +151,6 @@ class Coimf_Action {
     }
 
     private string $mPluginName;
-    private string $mAPIVersion;
+    private const cAPIVersion = "v1";
 
 }

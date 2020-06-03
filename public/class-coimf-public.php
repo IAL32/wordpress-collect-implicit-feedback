@@ -48,18 +48,6 @@ class Coimf_Public {
 	 */
 	public function enqueueStyles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Coimf_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Coimf_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . "css/coimf-public.css", array(), $this->mVersion, "all" );
 
 	}
@@ -69,21 +57,33 @@ class Coimf_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueueScripts() {
+	public function enqueueScripts() : void {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Coimf_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Coimf_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		$vCoimf = [
+			"mPluginName" => $this->mPluginName,
+			"mVersion" => $this->mVersion,
+			"mAPIVersion" => $this->mAPIVersion,
+			"mIsUserAdmin" => is_admin(),
+		];
 
-		// wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . "js/coimf-public.js", array( "jquery" ), $this->mVersion, false );
+		wp_enqueue_script(
+			"coimf-public",
+			plugin_dir_url( __FILE__ ) . "public/assets/js/coimf-public.js",
+			[ "jquery" ],
+			$this->mVersion,
+			false
+		);
+		wp_localize_script( "coimf-public", "gCoimf", $vCoimf);
+
+		// TODO: make this customizable
+		wp_enqueue_script(
+			"coimf-track-click",
+			plugin_dir_url( __FILE__ ) . "public/assets/js/coimf-track-click.js",
+			[ "jquery" ],
+			$this->mVersion,
+			false
+		);
+		wp_localize_script( "coimf-track-click", "gCoimf", $vCoimf);
 
 	}
 
@@ -94,8 +94,8 @@ class Coimf_Public {
 			return;
 		}
 
-		$vCurrentURL = home_url( $wp->request );
-		Coimf_Action::addInternalLinkAction( $this->mCookie->getGUID(), $vHTTPReferer, $vCurrentURL, time() );
+		$vCurrentSlug = "/" . add_query_arg( [], $wp->request );
+		Coimf_Action::addInternalLinkAction( $this->mCookie->getGUID(), $vHTTPReferer, $vCurrentSlug, time() );
 	}
 
 }

@@ -30,9 +30,9 @@ class Coimf {
 	 */
 	protected $mVersion;
 
-	protected $mAPIVersion;
-
 	protected $mDB;
+
+	protected $mAction;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -110,7 +110,7 @@ class Coimf {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "public/class-coimf-public.php";
 
 		$this->mLoader = new Coimf_Loader();
-		$this->mAction = new Coimf_Action( $this->mCoimf, $this->mAPIVersion );
+		$this->mAction = new Coimf_Action( $this->mCoimf );
 		$this->mDB = Coimf_DB::getInstance();
 
 	}
@@ -144,6 +144,7 @@ class Coimf {
 		$vPluginPublic = new Coimf_Public( $this->getCoimf(), $this->getVersion() );
 
 		$this->mLoader->addAction( "init", $vPluginPublic, "handleSession" );
+		$this->mLoader->addAction( "rest_api_init", $this->mAction, "registerEndpoint" );
 		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueStyles" );
 		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueScripts" );
 
@@ -186,7 +187,7 @@ class Coimf {
 	 * @return    string    The version number of the plugin.
 	 */
 	public function getVersion() {
-		return $this->version;
+		return $this->mVersion;
 	}
 
 }

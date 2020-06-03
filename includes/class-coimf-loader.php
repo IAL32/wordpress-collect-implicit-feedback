@@ -27,8 +27,8 @@ class Coimf_Loader {
 	 */
 	public function __construct() {
 
-		$this->mActions = array();
-		$this->mFilters = array();
+		$this->mActions = [];
+		$this->mFilters = [];
 
 	}
 
@@ -76,13 +76,13 @@ class Coimf_Loader {
 	 */
 	private function add( $aHooks, $aHook, $aComponent, $aCallback, $aPriority, $aAcceptedArgs ) {
 
-		$aHooks[] = array(
+		$aHooks[] = [
 			"hook"          => $aHook,
 			"component"     => $aComponent,
 			"callback"      => $aCallback,
 			"priority"      => $aPriority,
 			"accepted_args" => $aAcceptedArgs
-		);
+		];
 
 		return $aHooks;
 
@@ -96,11 +96,11 @@ class Coimf_Loader {
 	public function run() {
 
 		foreach ( $this->mFilters as $vHook ) {
-			add_filter( $vHook["hook"], array( $vHook["component"], $vHook["callback"] ), $vHook["priority"], $vHook["accepted_args"] );
+			add_filter( $vHook["hook"], [ $vHook["component"], $vHook["callback"] ], $vHook["priority"], $vHook["accepted_args"] );
 		}
 
 		foreach ( $this->mActions as $vHook ) {
-			add_action( $vHook["hook"], array( $vHook["component"], $vHook["callback"] ), $vHook["priority"], $vHook["accepted_args"] );
+			add_action( $vHook["hook"], [ $vHook["component"], $vHook["callback"] ], $vHook["priority"], $vHook["accepted_args"] );
 		}
 
 	}

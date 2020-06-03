@@ -2,33 +2,33 @@
 
 // https://stackoverflow.com/a/254543
 abstract class Coimf_Enum {
-    private static $constCacheArray = NULL;
+    private static $cConstCacheArray = NULL;
 
     private static function getConstants() {
-        if (self::$constCacheArray == NULL) {
-            self::$constCacheArray = [];
+        if ( self::$cConstCacheArray == NULL ) {
+            self::$cConstCacheArray = [];
         }
-        $calledClass = get_called_class();
-        if (!array_key_exists($calledClass, self::$constCacheArray)) {
-            $reflect = new ReflectionClass($calledClass);
-            self::$constCacheArray[$calledClass] = $reflect->getConstants();
+        $vCalledClass = get_called_class();
+        if ( !array_key_exists( $vCalledClass, self::$cConstCacheArray ) ) {
+            $vReflect = new ReflectionClass( $vCalledClass );
+            self::$cConstCacheArray[$vCalledClass] = $vReflect->getConstants();
         }
-        return self::$constCacheArray[$calledClass];
+        return self::$cConstCacheArray[$vCalledClass];
     }
 
-    public static function isValidName($name, $strict = false) {
-        $constants = self::getConstants();
+    public static function isValidName( $aName, $aStrict = false ) {
+        $vConstants = self::getConstants();
 
-        if ($strict) {
-            return array_key_exists($name, $constants);
+        if ( $aStrict ) {
+            return array_key_exists( $aName, $vConstants );
         }
 
-        $keys = array_map("strtolower", array_keys($constants));
-        return in_array(strtolower($name), $keys);
+        $vKeys = array_map( "strtolower", array_keys( $vConstants ) );
+        return in_array( strtolower( $aName ), $vKeys );
     }
 
-    public static function isValidValue($value, $strict = true) {
-        $values = array_values(self::getConstants());
-        return in_array($value, $values, $strict);
+    public static function isValidValue( $aValue, $aStrict = true ) {
+        $vValues = array_values( self::getConstants() );
+        return in_array( $aValue, $vValues, $aStrict );
     }
 }
