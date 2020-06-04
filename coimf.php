@@ -21,6 +21,9 @@ defined( "WPINC" ) || die;
  */
 define( "COIMF_DEBUG", true );
 
+define( "COIMF_ROOT_URL", plugin_dir_url( __FILE__ ) );
+define( "COIMF_ROOT_FOLDER", plugin_dir_path( __FILE__ ) );
+
 /**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org

@@ -10,6 +10,7 @@ class Coimf_Action {
 
     public function __construct( string $aPluginName ) {
         $this->mPluginName = $aPluginName;
+        $this->mLogger = new Coimf_Logger( "Coimf_Action" );
     }
 
     public function registerEndpoint() : void {
@@ -38,7 +39,7 @@ class Coimf_Action {
 
         $vCookie = Coimf_Cookie::getCookie();
 
-        self::addClickPosition( $vCookie->getGUID(), $vMouseX, $vMouseY, $vPageLocation , time() );
+        $this->addClickPosition( $vCookie->getGUID(), $vCookie->getSession(), $vMouseX, $vMouseY, $vPageLocation , new DateTime( "now" ) );
 
         return new WP_REST_Response( [ "message" => "Click logged" ], 200 );
     }
@@ -86,7 +87,7 @@ class Coimf_Action {
 
             $vQuery = $vDB->prepare( "
                 SELECT {$vSelect} from %s
-                WHERE time_end = %s
+                WHERE time_end <= %s
             ", $vTableName, $vTimeEndDateTime );
         } else if ( $vTimeStart > 0 && !$vTimeEnd ) {
             $vTimeStartDateTime = $vDB->timestampToMYSQLDateTime( $vTimeStart );
@@ -94,7 +95,7 @@ class Coimf_Action {
             $vQuery = $vDB->prepare( "
                 SELECT {$vSelect} from %s
                 WHERE id = %s AND
-                time_start = %s
+                time_start >= %s
             ", $vTableName, $vTimeStartDateTime );
         } else {
             $vTimeStartDateTime = $vDB->timestampToMYSQLDateTime( $vTimeStart );
@@ -102,8 +103,8 @@ class Coimf_Action {
 
             $vQuery = $vDB->prepare( "
                 SELECT {$vSelect} from %s
-                WHERE time_start = %s AND
-                time_end = %s
+                WHERE time_start >= %s AND
+                time_end <= %s
             ", $vTableName, $vTimeStartDateTime, $vTimeEndDateTime );
         }
 
@@ -117,40 +118,50 @@ class Coimf_Action {
         return $vDB->getResults( $vQuery );
     }
 
-    public static function addAction( int $aActionType, string $aUserGUID, $aValue, int $aTimeStart, int $aTimeEnd ) {
+    // FIXME: require a Coimf_Cookie instead of userGUID and session
+    public function addAction( int $aActionType, string $aUserGUID, string $aSession, $aValue, DateTime $aTimeStart, DateTime $aTimeEnd ) {
         $vDB = Coimf_DB::getInstance();
 
         $vTableName = $vDB->getDataTableName();
 
+        $vTimeStartFormat = $aTimeStart->format( "Y-m-d H:i:s" );
+        $vTimeEndFormat = $aTimeEnd->format( "Y-m-d H:i:s" );
+
         $vQuery = $vDB->prepare( "
             INSERT INTO %s
-            COLUMNS ( user_id, action_type, value, time_start, time_end )
-            VALUES ( %s, %s, %s, %s, %s )",
-            $vTableName, $aUserGUID, $aActionType, $aValue, $aTimeStart, $aTimeEnd );
+            COLUMNS ( user_id, session_id, action_type, value, time_start, time_end )
+            VALUES (  %s,       %s,        %s,          %s,    %s,         %s )",
+            $vTableName, $aUserGUID, $aSession, $aActionType, $aValue, $vTimeStartFormat, $vTimeEndFormat );
+
+        if ( COIMF_DEBUG ) {
+            $this->mLogger->log( 2, "::addAction()", $vQuery );
+            return true;
+        }
 
         return $vDB->query( $vQuery );
     }
 
-    public static function addInternalLinkAction( string $aUserGUID, string $aFromLink, string $aToLink, int $aTime ) {
+    public function addInternalLinkAction( string $aUserGUID, string $aSession, string $aFromLink, string $aToLink, DateTime $aTime ) {
         $vValue = json_encode([
             "from" => $aFromLink,
             "to" => $aToLink,
         ]);
 
-        return self::addAction( Coimf_Action_Type::InternalLink, $aUserGUID, $vValue, $aTime, $aTime );
+        return $this->addAction( Coimf_Action_Type::InternalLink, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
 
-    public static function addClickPosition( string $aUserGUID, int $aMouseX, int $aMouseY, $aPageURL, $aTime ) {
+    public function addClickPosition( string $aUserGUID, string $aSession, int $aMouseX, int $aMouseY, $aPageURL, DateTime $aTime ) {
         $vValue = json_encode([
             "mouseX" => $aMouseX,
             "mouseY" => $aMouseY,
             "location" => $aPageURL,
         ]);
 
-        return self::addAction( Coimf_Action_Type::Click, $aUserGUID, $vValue, $aTime, $aTime );
+        return $this->addAction( Coimf_Action_Type::Click, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
 
     private string $mPluginName;
+    private Coimf_Logger $mLogger;
     private const cAPIVersion = "v1";
 
 }

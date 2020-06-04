@@ -10,18 +10,24 @@ class Coimf_Activator {
 		$vDB = Coimf_DB::getInstance();
 
 		$vTableName = $vDB->getDataTableName();
-		if( $vDB->get_var( "show tables like '{$vTableName}'" ) != $vTableName ) {
-			$sql = "CREATE TABLE {$vTableName}
-			( id         int NOT NULL GENERATED ALWAYS AS IDENTITY ( minvalue 1 start 1 ),
-			 guid			text NOT NULL,
-			 action_type int NOT NULL,
-			 value       text NOT NULL,
-			 time_start   time with time zone NOT NULL,
-			 time_end   time with time zone NOT NULL,
-			 CONSTRAINT PK_{$vTableName} PRIMARY KEY ( id )
+		if( $vDB->getVar( "show tables like '{$vTableName}'" ) != $vTableName ) {
+			$vSql = "CREATE TABLE {$vTableName}
+				`id` INT unsigned NOT NULL AUTO_INCREMENT,
+				`user_id` VARCHAR(36) COMMENT 'GUID',
+				`session_id` VARCHAR(28) COMMENT 'GUID',
+				`action_type` INT unsigned NOT NULL,
+				`value` TEXT NOT NULL,
+				`time_start` DATETIME NOT NULL,
+				`time_end` DATETIME NOT NULL,
+				PRIMARY KEY (`id`)
 			);";
 			require_once( ABSPATH . "/wp-admin/includes/upgrade.php" );
-			dbDelta( $sql );
+			if ( COIMF_DEBUG ) {
+				$vLogger = new Coimf_Logger( "Coimf_Activator" );
+				$vLogger->log( 2, $vSql );
+			} else {
+				dbDelta( $vSql );
+			}
 		}
 	}
 

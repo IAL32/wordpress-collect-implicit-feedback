@@ -7,13 +7,8 @@ class Coimf_Logger {
     /**
      * @param integer $aLevel Describes the level of verbosity of this logger instance
      */
-    public function __construct( $aLogGroup, $aTime = false ) {
-        $this->mLogDirectory = wp_get_upload_dir() . "/" . $aLogGroup;
-        if ( !$aTime ) {
-            $this->mTime = time();
-        } else {
-            $this->mTime = $aTime;
-        }
+    public function __construct( string $aLogGroup ) {
+        $this->mLogDirectory = wp_get_upload_dir()["basedir"] . "/" . $aLogGroup;
     }
 
     public function log( $aLogLevel = 2 ) {
@@ -86,14 +81,10 @@ class Coimf_Logger {
     }
 
     private function generateDateString( $aTimestampFormat ) : string {
-        return date( $aTimestampFormat, $this->mTime );
+        return date( $aTimestampFormat, time() );
     }
 
     private function openFile( $aPath, $aMode = "r" ) {
-
-        if ( !file_exists( $aPath ) ) {
-            throw new Exception( "Coimf_Logger::openFile(): file does not exist" );
-        }
 
         if ( is_dir( $aPath ) ) {
             throw new Exception( "Coimf_Logger::openFile(): file is a directory" );
@@ -162,6 +153,4 @@ class Coimf_Logger {
     /** End line character for each log line */
     private $mLogLineEndLine = "\n";
 
-    /** The current timestamp */
-    private $mTime;
 }

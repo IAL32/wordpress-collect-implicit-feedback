@@ -82,6 +82,8 @@ class Coimf {
 	 */
 	private function loadDependencies() {
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-enum.php";
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-activator.php";
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-action.php";
@@ -91,8 +93,6 @@ class Coimf {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-db.php";
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-deactivator.php";
-
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-enum.php";
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-loader.php";
 
@@ -143,7 +143,7 @@ class Coimf {
 
 		$vPluginPublic = new Coimf_Public( $this->getCoimf(), $this->getVersion() );
 
-		$this->mLoader->addAction( "init", $vPluginPublic, "handleSession" );
+		$this->mLoader->addAction( "init", $vPluginPublic, "handleSessionStart" );
 		$this->mLoader->addAction( "rest_api_init", $this->mAction, "registerEndpoint" );
 		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueStyles" );
 		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueScripts" );

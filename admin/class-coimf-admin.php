@@ -85,10 +85,14 @@ class Coimf_Admin {
 			$this->mPluginName,
 			"Track User Data",
 			"manage_options",
-			$this->mPluginName,
-			plugin_dir_path( __FILE__ ) . "/admin/partials/coimf-admin-display.php",
-			plugin_dir_url( __FILE__ ) . "/icon.png"
+			"coimf-admin-display",
+			[ $this, "mainPage" ],
+			COIMF_ROOT_URL . "icon.png"
 		);
+	}
+
+	public function mainPage() {
+		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-display.php" );
 	}
 
 }

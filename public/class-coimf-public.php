@@ -95,7 +95,11 @@ class Coimf_Public {
 		}
 
 		$vCurrentSlug = "/" . add_query_arg( [], $wp->request );
-		Coimf_Action::addInternalLinkAction( $this->mCookie->getGUID(), $vHTTPReferer, $vCurrentSlug, time() );
+
+		// FIXME: this should not be instantiated every time. Find a better way
+		// to access members from Coimf class
+		$vAction = new Coimf_Action( $this->mPluginName );
+		$vAction->addInternalLinkAction( $this->mCookie->getGUID(), $this->mCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new DateTime( "now" ) );
 	}
 
 }
