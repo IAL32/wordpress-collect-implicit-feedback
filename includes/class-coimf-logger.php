@@ -8,11 +8,11 @@ class Coimf_Logger {
      * @param integer $aLevel Describes the level of verbosity of this logger instance
      */
     public function __construct( string $aLogGroup ) {
-        $this->mLogDirectory = wp_get_upload_dir()["basedir"] . "/" . $aLogGroup;
+        $this->mLogDirectory = wp_get_upload_dir()["basedir"] . "/" . $aLogGroup . "/";
     }
 
     public function log( $aLogLevel = 2 ) {
-        $vLogFilePath = $this->generateFileName();
+        $vLogFilePath = $this->mLogDirectory . $this->generateFileName();
         $vHandle = $this->openFile( $vLogFilePath, "a+" );
         $vMessages = func_get_args();
         // removing the first argument, which is just $aLogLevel
@@ -94,6 +94,10 @@ class Coimf_Logger {
 
         if ( !$vHandle ) {
             throw new Exception( "Coimf_Logger::openFile(): could not open file" );
+        }
+
+        if ( ! file_exists( $aPath ) ) {
+            fwrite( $vHandle, "" );
         }
 
         return $vHandle;

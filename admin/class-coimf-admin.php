@@ -87,7 +87,7 @@ class Coimf_Admin {
 			"manage_options",
 			"coimf-admin-display",
 			[ $this, "mainPage" ],
-			COIMF_ROOT_URL . "icon.png"
+			COIMF_ROOT_URL . "icon.ico"
 		);
 	}
 
