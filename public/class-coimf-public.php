@@ -68,7 +68,7 @@ class Coimf_Public {
 
 		wp_enqueue_script(
 			"coimf-public",
-			plugin_dir_url( __FILE__ ) . "public/assets/js/coimf-public.js",
+			plugin_dir_url( __FILE__ ) . "assets/js/coimf-public.js",
 			[ "jquery" ],
 			$this->mVersion,
 			false
@@ -78,7 +78,7 @@ class Coimf_Public {
 		// TODO: make this customizable
 		wp_enqueue_script(
 			"coimf-track-click",
-			plugin_dir_url( __FILE__ ) . "public/assets/js/coimf-track-click.js",
+			plugin_dir_url( __FILE__ ) . "assets/js/coimf-track-click.js",
 			[ "jquery" ],
 			$this->mVersion,
 			false
@@ -88,6 +88,12 @@ class Coimf_Public {
 	}
 
 	private function refererAction() : void {
+
+		// page was refreshed
+		if ( $this->isPageRefresh() ) {
+			return;
+		}
+
 		global $wp;
 		$vHTTPReferer = wp_get_referer();
 		if ( !$vHTTPReferer ) {
@@ -102,4 +108,7 @@ class Coimf_Public {
 		$vAction->addInternalLinkAction( $this->mCookie->getGUID(), $this->mCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new DateTime( "now" ) );
 	}
 
+	private function isPageRefresh() {
+		return isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] == 'max-age=0';
+	}
 }

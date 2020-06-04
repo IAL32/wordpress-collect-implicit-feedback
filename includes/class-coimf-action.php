@@ -16,7 +16,7 @@ class Coimf_Action {
     public function registerEndpoint() : void {
         register_rest_route(
             $this->mPluginName . "/" . self::cAPIVersion,
-            "/track/(?P<mouseX>\d+),(?P<mouseY>\d+)",
+            "/track/(?P<mouseX>\\d+),(?P<mouseY>\\d+)",
             [
                 "methods" => WP_REST_Server::CREATABLE,
                 "callback" => [ $this, "addClickPositionCallback" ]
@@ -142,10 +142,15 @@ class Coimf_Action {
     }
 
     public function addInternalLinkAction( string $aUserGUID, string $aSession, string $aFromLink, string $aToLink, DateTime $aTime ) {
+        if ((isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] == 'max-age=0')) {
+
+        }
+
         $vValue = json_encode([
             "from" => $aFromLink,
             "to" => $aToLink,
         ]);
+
 
         return $this->addAction( Coimf_Action_Type::InternalLink, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
@@ -158,6 +163,12 @@ class Coimf_Action {
         ]);
 
         return $this->addAction( Coimf_Action_Type::Click, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+    }
+
+    private function isLinkLocal( string $aLink ) {
+        $vComponents = parse_url( $aLink );
+        // empty host will indicate url like '/relative.php'
+        return !empty( $vComponents['host'] ) || strcasecmp( $vComponents['host'], $_SERVER["SERVER_NAME"] );
     }
 
     private string $mPluginName;
