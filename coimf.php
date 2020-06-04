@@ -20,6 +20,8 @@ defined( "WPINC" ) || die;
  * In the debug status, the plugin will not make any permanent changes.
  */
 define( "COIMF_DEBUG", true );
+define( "COIMF_DRY_UPDATE", false );
+define( "COIMF_COOKIE_FORCE", false );
 
 define( "COIMF_ROOT_URL", plugin_dir_url( __FILE__ ) );
 define( "COIMF_ROOT_FOLDER", plugin_dir_path( __FILE__ ) );
@@ -32,6 +34,8 @@ define( "COIMF_ROOT_FOLDER", plugin_dir_path( __FILE__ ) );
 define( "COIMF_VERSION", "1.0.0" );
 
 define( "COIMF_API_VERSION", "v1" );
+
+define( "COIMF_NAME", "Coimf" );
 
 /**
  * The code that runs during plugin activation.

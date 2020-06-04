@@ -94,6 +94,11 @@ class Coimf_Public {
 			return;
 		}
 
+		// we do not log ajax requests
+		if ( $this->isRequestAjax() ) {
+			return;
+		}
+
 		global $wp;
 		$vHTTPReferer = wp_get_referer();
 		if ( !$vHTTPReferer ) {
@@ -110,5 +115,10 @@ class Coimf_Public {
 
 	private function isPageRefresh() {
 		return isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] == 'max-age=0';
+	}
+
+	private function isRequestAjax() {
+		return !empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 
+				strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest';
 	}
 }

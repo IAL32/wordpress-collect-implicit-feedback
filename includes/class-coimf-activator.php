@@ -22,20 +22,26 @@ class Coimf_Activator {
 				PRIMARY KEY (`id`)
 			);";
 			require_once( ABSPATH . "/wp-admin/includes/upgrade.php" );
-			if ( COIMF_DEBUG ) {
+			if ( COIMF_DRY_UPDATE ) {
 				$vLogger = new Coimf_Logger( "Coimf_Activator" );
-				$vLogger->log( 2, $vSql );
+				$vLogger->log( 2, "::createDataTable()", $vSql );
 			} else {
 				dbDelta( $vSql );
 			}
 		}
 	}
 
-	public static function drop_tables() {
+	public static function dropTables() {
 		global $wpdb;
 		$vTableNames[] = $wpdb->prefix . Coimf_DB::$cTablePrefix . Coimf_DB::$cDataTableName;
 		foreach( $vTableNames as $vTableName ) {
-			$wpdb->query( "DROP TABLE IF EXISTS {$vTableName}" );
+			$vQuery = "DROP TABLE IF EXISTS {$vTableName}";
+			if ( COIMF_DRY_UPDATE ) {
+				$vLogger = new Coimf_Logger( "Coimf_Activator" );
+				$vLogger->log( 2, "::dropTables()", $vQuery );
+			} else {
+				$wpdb->query( $vQuery );
+			}
 		}
 	}
 }

@@ -12,7 +12,7 @@ class Coimf_Logger {
     }
 
     public function log( $aLogLevel = 2 ) {
-        $vLogDirectory = wp_upload_dir()["basedir"] . "/" . $this->mLogGroup;
+        $vLogDirectory = wp_upload_dir()["basedir"] . "/" . COIMF_NAME . "/" . $this->mLogGroup;
 
         if ( ! file_exists( $vLogDirectory ) ) {
             wp_mkdir_p( $vLogDirectory );

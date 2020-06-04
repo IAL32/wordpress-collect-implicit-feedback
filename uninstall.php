@@ -33,4 +33,4 @@ if ( ! defined( "WP_UNINSTALL_PLUGIN" ) ) {
 
 include_once dirname( __FILE__ ) . "/includes/class-coimf-activator.php";
 
-Coimf_Activator::drop_tables();
+Coimf_Activator::dropTables();
