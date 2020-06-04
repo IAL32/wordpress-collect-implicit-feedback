@@ -8,11 +8,17 @@ class Coimf_Logger {
      * @param integer $aLevel Describes the level of verbosity of this logger instance
      */
     public function __construct( string $aLogGroup ) {
-        $this->mLogDirectory = wp_get_upload_dir()["basedir"] . "/" . $aLogGroup . "/";
+        $this->mLogGroup = $aLogGroup;
     }
 
     public function log( $aLogLevel = 2 ) {
-        $vLogFilePath = $this->mLogDirectory . $this->generateFileName();
+        $vLogDirectory = wp_upload_dir()["basedir"] . "/" . $this->mLogGroup;
+
+        if ( ! file_exists( $vLogDirectory ) ) {
+            wp_mkdir_p( $vLogDirectory );
+        }
+
+        $vLogFilePath = $vLogDirectory . "/" . $this->generateFileName();
         $vHandle = $this->openFile( $vLogFilePath, "a+" );
         $vMessages = func_get_args();
         // removing the first argument, which is just $aLogLevel
@@ -58,16 +64,15 @@ class Coimf_Logger {
      * This function will take an indefinite amount of arguments and will
      * glue them together to generate a log line.
      */
-    private function generateLogLine( $aLogLevel = 2, $aMessages ) : string {
+    private function generateLogLine( $aLogLevel = 2, array $aMessages = [] ) : string {
         $vDate = $this->generateDateString( $this->mLogLineTimestampFormat );
         $vLevel = $aLogLevel;
-        $vMessages = [];
         $vMessage = "";
 
         if ( count( $aMessages ) == 0 ) {
             $vMessage = "";
         } else {
-            $vMessage = implode( $this->mLogLineMessagesImplodeGlue, $vMessages );
+            $vMessage = implode( $this->mLogLineMessagesImplodeGlue, $aMessages );
         }
         return sprintf( $this->mLogLineFormat, $vDate, $vLevel, $vMessage );
     }
@@ -122,20 +127,17 @@ class Coimf_Logger {
      * %1$s is the filename, no extension
      * %2$s the second is the file extension
      */
-    private $mLogFileFormat = "%1\$s.%2s\$s";
+    private string $mLogFileFormat = "%1\$s%2\$s";
 
     /** The extension of the file */
-    private $mLogFileExtension = ".log";
+    private string $mLogFileExtension = ".log";
 
     /**
      * Timestamp format.
      * E.g.: 17 May 2019 at 16 hours, 04 minutes and 12 seconds
      * Result: 17/05/2019,16:04:12
      */
-    private $mLogFileTimestampFormat = "d-m-y";
-
-    /** The directory where the log files will be stored */
-    private $mLogDirectory;
+    private string $mLogFileTimestampFormat = "d-m-y";
 
     /**
      * How the log line will be generated.
@@ -143,18 +145,20 @@ class Coimf_Logger {
      * %2$d is the log level
      * %3$s is log text
      */
-    private $mLogLineFormat = "[%1\$s] %2\$d %3\$s";
+    private string $mLogLineFormat = "[%1\$s] %2\$d %3\$s";
 
     /** The timestamp that is going to be shown on each log line */
-    private $mLogLineTimestampFormat = "d/m/y,H:i:s";
+    private string $mLogLineTimestampFormat = "d/m/y,H:i:s";
+
+    private string $mLogGroup;
 
     /**
      * How each parameter is going to be glued to each other when multiple
      * values are being passed to the debuggerss
     */
-    private $mLogLineMessagesImplodeGlue = " ";
+    private string $mLogLineMessagesImplodeGlue = " ";
 
     /** End line character for each log line */
-    private $mLogLineEndLine = "\n";
+    private string $mLogLineEndLine = "\n";
 
 }
