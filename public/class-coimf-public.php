@@ -62,8 +62,10 @@ class Coimf_Public {
 		$vCoimf = [
 			"mPluginName" => $this->mPluginName,
 			"mVersion" => $this->mVersion,
-			"mAPIVersion" => $this->mAPIVersion,
-			"mIsUserAdmin" => is_admin(),
+			"mIsUserAdmin" => is_admin() ? "true" : "false",
+			"mSettings" => [
+				"mPageTrackSelector" => get_option( "coimf_track_page_selector" )
+			]
 		];
 
 		wp_enqueue_script(
@@ -84,6 +86,17 @@ class Coimf_Public {
 			false
 		);
 		wp_localize_script( "coimf-track-click", "gCoimf", $vCoimf);
+
+		if ( is_single() ) {
+			wp_enqueue_script(
+				"coimf-track-page-time",
+				plugin_dir_url( __FILE__ ) . "assets/js/coimf-track-page-time.js",
+				[ "jquery" ],
+				$this->mVersion,
+				false
+			);
+			wp_localize_script( "coimf-track-page-time", "gCoimf", $vCoimf);
+		}
 
 	}
 
@@ -121,4 +134,6 @@ class Coimf_Public {
 		return !empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 
 				strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest';
 	}
+
 }
+

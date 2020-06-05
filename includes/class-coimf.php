@@ -128,6 +128,7 @@ class Coimf {
 
 		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueStyles" );
 		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueScripts" );
+		$this->mLoader->addAction( "admin_init", $vPluginAdmin, "registerSettings" );
 		$this->mLoader->addAction( "admin_menu", $vPluginAdmin, "addMenuPage" );
 
 	}

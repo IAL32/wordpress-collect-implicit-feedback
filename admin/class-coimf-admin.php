@@ -76,8 +76,12 @@ class Coimf_Admin {
 		 * class.
 		 */
 
-		// wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . "js/coimf-admin.js", array( "jquery" ), $this->mVersion, false );
+		wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . "assets/js/vendor/html2canvas.js", array( "jquery" ), $this->mVersion, false );
 
+	}
+
+	public function registerSettings() {
+		register_setting("coimf-settings-group", "coimf_track_page_selector");
 	}
 
 	public function addMenuPage() {
@@ -89,10 +93,24 @@ class Coimf_Admin {
 			[ $this, "mainPage" ],
 			COIMF_ROOT_URL . "icon.ico"
 		);
+
+		add_submenu_page(
+			"coimf-admin-display",
+			"Settings",
+			"Settings",
+			"manage_options",
+			"coimf-admin-display/settings",
+			[ $this, "settingsPage" ]
+		);
 	}
 
 	public function mainPage() {
 		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-display.php" );
+	}
+
+	public function settingsPage() {
+		echo '<p>These settings apply to all Coimf functionality.</p>';
+		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-settings.php" );
 	}
 
 }

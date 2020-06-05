@@ -4,6 +4,7 @@ abstract class Coimf_Action_Type extends Coimf_Enum {
     const None = -1;
     const InternalLink = 0;
     const Click = 1;
+    const PageRead = 2;
 }
 
 class Coimf_Action {
@@ -16,10 +17,18 @@ class Coimf_Action {
     public function registerEndpoint() : void {
         register_rest_route(
             $this->mPluginName . "/" . self::cAPIVersion,
-            "/track/(?P<mouseX>\\d+),(?P<mouseY>\\d+)",
+            "/track-click/",
             [
                 "methods" => WP_REST_Server::CREATABLE,
                 "callback" => [ $this, "addClickPositionCallback" ]
+            ]
+        );
+        register_rest_route(
+            $this->mPluginName . "/" . self::cAPIVersion,
+            "/track-page-time/",
+            [
+                "methods" => WP_REST_Server::CREATABLE,
+                "callback" => [ $this, "addPageTimeCallback" ]
             ]
         );
     }
@@ -31,6 +40,8 @@ class Coimf_Action {
 
         $vMouseX = $aRequest->get_param( "mouseX" );
         $vMouseY = $aRequest->get_param( "mouseY" );
+        $vResolutionX = $aRequest->get_param( "resolutionX" );
+        $vResolutionY = $aRequest->get_param( "resolutionY" );
         $vPageLocation = $aRequest->get_param( "pageLocation" );
 
         if ( $vMouseX < 0 || $vMouseY < 0 ) {
@@ -39,7 +50,39 @@ class Coimf_Action {
 
         $vCookie = Coimf_Cookie::getCookie();
 
-        $this->addClickPosition( $vCookie->getGUID(), $vCookie->getSession(), $vMouseX, $vMouseY, $vPageLocation , new DateTime( "now" ) );
+        $vQueryResult = $this->addClickPosition(
+            $vCookie->getGUID(),
+            $vCookie->getSession(),
+            $vMouseX, $vMouseY,
+            $vResolutionX, $vResolutionY,
+            $vPageLocation,
+            new DateTime( "now" )
+        );
+
+        $this->mLogger->log( 2, "::addClickPositionCallback()", var_export( $vQueryResult, true ) );
+
+        return new WP_REST_Response( [ "message" => "Click logged" ], 200 );
+    }
+
+    public function addPageTimeCallback( WP_REST_Request $aRequest ) {
+        if ( is_admin() ) {
+            return new WP_REST_Response( [ "message" => "Not logging admin times" ], 200 );
+        }
+
+        $vPageTime = $aRequest->get_param( "pageTime" );
+        $vPageLocation = $aRequest->get_param( "pageLocation" );
+
+        $vCookie = Coimf_Cookie::getCookie();
+
+        $vQueryResult = $this->addPageTime(
+            $vCookie->getGUID(),
+            $vCookie->getSession(),
+            $vPageTime,
+            $vPageLocation,
+            new DateTime( "now" )
+        );
+
+        $this->mLogger->log( 2, "::addPageTimeCallback()", var_export( $vQueryResult, true ) );
 
         return new WP_REST_Response( [ "message" => "Click logged" ], 200 );
     }
@@ -79,33 +122,31 @@ class Coimf_Action {
         $vTableName = $vDB->getDataTableName();
 
         if ( !$vTimeStart && !$vTimeEnd ) {
-            $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from %s
-            ", $vTableName );
+            $vQuery = "SELECT {$vSelect} from {$vTableName}";
         } else if ( !$vTimeStart && $vTimeEnd > 0 ) {
             $vTimeEndDateTime = $vDB->timestampToMYSQLDateTime( $vTimeEnd );
 
             $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from %s
+                SELECT {$vSelect} from {$vTableName}
                 WHERE time_end <= %s
-            ", $vTableName, $vTimeEndDateTime );
+            ", $vTimeEndDateTime );
         } else if ( $vTimeStart > 0 && !$vTimeEnd ) {
             $vTimeStartDateTime = $vDB->timestampToMYSQLDateTime( $vTimeStart );
 
             $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from %s
+                SELECT {$vSelect} from {$vTableName}
                 WHERE id = %s AND
                 time_start >= %s
-            ", $vTableName, $vTimeStartDateTime );
+            ", $vTimeStartDateTime );
         } else {
             $vTimeStartDateTime = $vDB->timestampToMYSQLDateTime( $vTimeStart );
             $vTimeEndDateTime = $vDB->timestampToMYSQLDateTime( $vTimeEnd );
 
             $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from %s
+                SELECT {$vSelect} from {$vTableName}
                 WHERE time_start >= %s AND
                 time_end <= %s
-            ", $vTableName, $vTimeStartDateTime, $vTimeEndDateTime );
+            ", $vTimeStartDateTime, $vTimeEndDateTime );
         }
 
         if ( $vLimitStart > -1 ) {
@@ -124,16 +165,16 @@ class Coimf_Action {
 
         $vTableName = $vDB->getDataTableName();
 
-        $vTimeStartFormat = $aTimeStart->format( "Y-m-d H:i:s" );
-        $vTimeEndFormat = $aTimeEnd->format( "Y-m-d H:i:s" );
+        $vTimeStartFormat = $aTimeStart->format( self::cActionTimestampFormat );
+        $vTimeEndFormat = $aTimeEnd->format( self::cActionTimestampFormat );
 
         $vQuery = $vDB->prepare( "
-            INSERT INTO %s
-            COLUMNS ( user_id, session_id, action_type, value, time_start, time_end )
-            VALUES (  %s,       %s,        %s,          %s,    %s,         %s )",
-            $vTableName, $aUserGUID, $aSession, $aActionType, $aValue, $vTimeStartFormat, $vTimeEndFormat );
+            INSERT INTO {$vTableName}
+                   (  user_id, session_id, action_type, value, time_start, time_end )
+            VALUES (  %s,       %s,        %d,          %s,    %s,         %s )",
+            $aUserGUID, $aSession, $aActionType, $aValue, $vTimeStartFormat, $vTimeEndFormat );
 
-        if ( COIMF_DEBUG ) {
+        if ( COIMF_DRY_UPDATE ) {
             $this->mLogger->log( 2, "::addAction()", $vQuery );
             return true;
         }
@@ -141,28 +182,54 @@ class Coimf_Action {
         return $vDB->query( $vQuery );
     }
 
-    public function addInternalLinkAction( string $aUserGUID, string $aSession, string $aFromLink, string $aToLink, DateTime $aTime ) {
-        if ((isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] == 'max-age=0')) {
-
-        }
-
+    public function addInternalLinkAction( string $aUserGUID, string $aSession,
+                                           string $aFromLink, string $aToLink,
+                                           DateTime $aTime ) {
         $vValue = json_encode([
             "from" => $aFromLink,
             "to" => $aToLink,
         ]);
 
-
         return $this->addAction( Coimf_Action_Type::InternalLink, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
 
-    public function addClickPosition( string $aUserGUID, string $aSession, int $aMouseX, int $aMouseY, $aPageURL, DateTime $aTime ) {
+    public function addClickPosition( string $aUserGUID, string $aSession,
+                                      int $aMouseX, int $aMouseY,
+                                      int $aResolutionX, int $aResolutionY,
+                                      string $aPageURL, DateTime $aTime ) {
         $vValue = json_encode([
             "mouseX" => $aMouseX,
             "mouseY" => $aMouseY,
+            "resolutionX" => $aResolutionX,
+            "resolutionY" => $aResolutionY,
             "location" => $aPageURL,
         ]);
 
         return $this->addAction( Coimf_Action_Type::Click, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+    }
+
+    public function addPageTime( string $aUserGUID, string $aSession,
+                                 int $aPageTime,
+                                 string $aPageURL, DateTime $aTime ) {
+        $vValue = json_encode([
+            "pageTime" => $aPageTime,
+            "location" => $aPageURL,
+        ]);
+
+        return $this->addAction( Coimf_Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+    }
+
+    public static function fromAction( stdClass $aActionObject ) {
+        $vNewObject = clone $aActionObject;
+        $vNewObject->value = json_decode( $aActionObject->value );
+
+        $vNewObject->time_start = DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_start );
+        $vNewObject->time_end = DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_end );
+        // switch( intval( $aActionObject->action_type ) ) {
+        //     case Coimf_Action_Type::Click: {
+        //     }
+        // }
+        return $vNewObject;
     }
 
     private function isLinkLocal( string $aLink ) {
@@ -174,5 +241,6 @@ class Coimf_Action {
     private string $mPluginName;
     private Coimf_Logger $mLogger;
     private const cAPIVersion = "v1";
+    private const cActionTimestampFormat = "Y-m-d H:i:s";
 
 }
