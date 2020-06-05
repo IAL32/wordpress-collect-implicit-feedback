@@ -1,7 +1,7 @@
 <?php
-$vDB = Coimf_DB::getInstance();
+$vDB = \Coimf\DB::getInstance();
 
-$vActions = Coimf_Action::getAllActions();
+$vActions = \Coimf\Action::getAllActions();
 
 ?>
 
@@ -9,7 +9,7 @@ $vActions = Coimf_Action::getAllActions();
 <?php
 foreach ( $vActions as $vAction ) {
     echo "<tr>";
-    $vParsedAction = Coimf_Action::fromAction( $vAction );
+    $vParsedAction = \Coimf\Action::fromAction( $vAction );
     echo ( sprintf(
             "<td>%1\$s</td><td>%2\$s</td><td>%3\$s</td>",
             $vParsedAction->id, $vParsedAction->user_id, $vParsedAction->session_id

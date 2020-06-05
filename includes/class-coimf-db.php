@@ -1,5 +1,7 @@
 <?php
-class Coimf_DB {
+namespace Coimf {
+
+class DB {
 
 // Public
 
@@ -15,7 +17,7 @@ class Coimf_DB {
         if (self::$mInstance) {
             return self::$mInstance;
         }
-        return new Coimf_DB();
+        return new self();
     }
 
     public function timestampToMYSQLDateTime( $aTime ) {
@@ -23,7 +25,7 @@ class Coimf_DB {
     }
 
     public function getDataTableName() {
-        return $this->mWPDB->prefix . Coimf_DB::$cTablePrefix . Coimf_DB::$cDataTableName;
+        return $this->mWPDB->prefix . self::$cTablePrefix . self::$cDataTableName;
     }
 
     public function query() {
@@ -59,4 +61,6 @@ class Coimf_DB {
     }
 
     private static $mInstance = null;
+}
+
 }

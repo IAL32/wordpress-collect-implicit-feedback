@@ -109,9 +109,9 @@ class Coimf {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "public/class-coimf-public.php";
 
-		$this->mLoader = new Coimf_Loader();
-		$this->mAction = new Coimf_Action( $this->mCoimf );
-		$this->mDB = Coimf_DB::getInstance();
+		$this->mLoader = new \Coimf\Loader();
+		$this->mAction = new \Coimf\Action( $this->mCoimf );
+		$this->mDB = \Coimf\DB::getInstance();
 
 	}
 
@@ -124,7 +124,7 @@ class Coimf {
 	 */
 	private function defineAdminHooks() {
 
-		$vPluginAdmin = new Coimf_Admin( $this->getCoimf(), $this->getVersion() );
+		$vPluginAdmin = new \Coimf\Admin_Handler( $this->getCoimf(), $this->getVersion() );
 
 		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueStyles" );
 		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueScripts" );
@@ -142,7 +142,7 @@ class Coimf {
 	 */
 	private function definePublicHooks() {
 
-		$vPluginPublic = new Coimf_Public( $this->getCoimf(), $this->getVersion() );
+		$vPluginPublic = new \Coimf\Public_Handler( $this->getCoimf(), $this->getVersion() );
 
 		$this->mLoader->addAction( "init", $vPluginPublic, "handleSessionStart" );
 		$this->mLoader->addAction( "rest_api_init", $this->mAction, "registerEndpoint" );

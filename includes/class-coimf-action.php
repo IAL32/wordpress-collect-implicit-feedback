@@ -1,17 +1,19 @@
 <?php
 
-abstract class Coimf_Action_Type extends Coimf_Enum {
+namespace Coimf {
+
+abstract class Action_Type extends Enum {
     const None = -1;
     const InternalLink = 0;
     const Click = 1;
     const PageRead = 2;
 }
 
-class Coimf_Action {
+class Action {
 
     public function __construct( string $aPluginName ) {
         $this->mPluginName = $aPluginName;
-        $this->mLogger = new Coimf_Logger( "Coimf_Action" );
+        $this->mLogger = new \Coimf\Logger( "Coimf_Action" );
     }
 
     public function registerEndpoint() : void {
@@ -19,7 +21,7 @@ class Coimf_Action {
             $this->mPluginName . "/" . self::cAPIVersion,
             "/track-click/",
             [
-                "methods" => WP_REST_Server::CREATABLE,
+                "methods" => \WP_REST_Server::CREATABLE,
                 "callback" => [ $this, "addClickPositionCallback" ]
             ]
         );
@@ -27,15 +29,15 @@ class Coimf_Action {
             $this->mPluginName . "/" . self::cAPIVersion,
             "/track-page-time/",
             [
-                "methods" => WP_REST_Server::CREATABLE,
+                "methods" => \WP_REST_Server::CREATABLE,
                 "callback" => [ $this, "addPageTimeCallback" ]
             ]
         );
     }
 
-    public function addClickPositionCallback( WP_REST_Request $aRequest ) {
+    public function addClickPositionCallback( \WP_REST_Request $aRequest ) {
         if ( is_admin() ) {
-            return new WP_REST_Response( [ "message" => "Not logging admin clicks" ], 200 );
+            return new \WP_REST_Response( [ "message" => "Not logging admin clicks" ], 200 );
         }
 
         $vMouseX = $aRequest->get_param( "mouseX" );
@@ -45,10 +47,10 @@ class Coimf_Action {
         $vPageLocation = $aRequest->get_param( "pageLocation" );
 
         if ( $vMouseX < 0 || $vMouseY < 0 ) {
-            return new WP_Error( "Coimf_Action::addClickPositionCallback()", "Mouse position not valid" );
+            return new \WP_Error( "Coimf_Action::addClickPositionCallback()", "Mouse position not valid" );
         }
 
-        $vCookie = Coimf_Cookie::getCookie();
+        $vCookie = \Coimf\Cookie::getCookie();
 
         $vQueryResult = $this->addClickPosition(
             $vCookie->getGUID(),
@@ -56,39 +58,39 @@ class Coimf_Action {
             $vMouseX, $vMouseY,
             $vResolutionX, $vResolutionY,
             $vPageLocation,
-            new DateTime( "now" )
+            new \DateTime( "now" )
         );
 
         $this->mLogger->log( 2, "::addClickPositionCallback()", var_export( $vQueryResult, true ) );
 
-        return new WP_REST_Response( [ "message" => "Click logged" ], 200 );
+        return new \WP_REST_Response( [ "message" => "Click logged" ], 200 );
     }
 
-    public function addPageTimeCallback( WP_REST_Request $aRequest ) {
+    public function addPageTimeCallback( \WP_REST_Request $aRequest ) {
         if ( is_admin() ) {
-            return new WP_REST_Response( [ "message" => "Not logging admin times" ], 200 );
+            return new \WP_REST_Response( [ "message" => "Not logging admin times" ], 200 );
         }
 
         $vPageTime = $aRequest->get_param( "pageTime" );
         $vPageLocation = $aRequest->get_param( "pageLocation" );
 
-        $vCookie = Coimf_Cookie::getCookie();
+        $vCookie = \Coimf\Cookie::getCookie();
 
         $vQueryResult = $this->addPageTime(
             $vCookie->getGUID(),
             $vCookie->getSession(),
             $vPageTime,
             $vPageLocation,
-            new DateTime( "now" )
+            new \DateTime( "now" )
         );
 
         $this->mLogger->log( 2, "::addPageTimeCallback()", var_export( $vQueryResult, true ) );
 
-        return new WP_REST_Response( [ "message" => "Click logged" ], 200 );
+        return new \WP_REST_Response( [ "message" => "Click logged" ], 200 );
     }
 
     public static function getAction( $aActionID ) {
-        $vDB = Coimf_DB::getInstance();
+        $vDB = \Coimf\DB::getInstance();
 
         $vTableName = $vDB->getDataTableName();
         $vQuery = $vDB->prepare(
@@ -118,7 +120,7 @@ class Coimf_Action {
         
         $vSelect = implode( ",", $vSelect );
 
-        $vDB = Coimf_DB::getInstance();
+        $vDB = \Coimf\DB::getInstance();
         $vTableName = $vDB->getDataTableName();
 
         if ( !$vTimeStart && !$vTimeEnd ) {
@@ -159,9 +161,9 @@ class Coimf_Action {
         return $vDB->getResults( $vQuery );
     }
 
-    // FIXME: require a Coimf_Cookie instead of userGUID and session
-    public function addAction( int $aActionType, string $aUserGUID, string $aSession, $aValue, DateTime $aTimeStart, DateTime $aTimeEnd ) {
-        $vDB = Coimf_DB::getInstance();
+    // FIXME: require a \Coimf\Cookie instead of userGUID and session
+    public function addAction( int $aActionType, string $aUserGUID, string $aSession, $aValue, \DateTime $aTimeStart, \DateTime $aTimeEnd ) {
+        $vDB = \Coimf\DB::getInstance();
 
         $vTableName = $vDB->getDataTableName();
 
@@ -184,19 +186,19 @@ class Coimf_Action {
 
     public function addInternalLinkAction( string $aUserGUID, string $aSession,
                                            string $aFromLink, string $aToLink,
-                                           DateTime $aTime ) {
+                                           \DateTime $aTime ) {
         $vValue = json_encode([
             "from" => $aFromLink,
             "to" => $aToLink,
         ]);
 
-        return $this->addAction( Coimf_Action_Type::InternalLink, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+        return $this->addAction( \Coimf\Action_Type::InternalLink, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
 
     public function addClickPosition( string $aUserGUID, string $aSession,
                                       int $aMouseX, int $aMouseY,
                                       int $aResolutionX, int $aResolutionY,
-                                      string $aPageURL, DateTime $aTime ) {
+                                      string $aPageURL, \DateTime $aTime ) {
         $vValue = json_encode([
             "mouseX" => $aMouseX,
             "mouseY" => $aMouseY,
@@ -205,28 +207,28 @@ class Coimf_Action {
             "location" => $aPageURL,
         ]);
 
-        return $this->addAction( Coimf_Action_Type::Click, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+        return $this->addAction( \Coimf\Action_Type::Click, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
 
     public function addPageTime( string $aUserGUID, string $aSession,
                                  int $aPageTime,
-                                 string $aPageURL, DateTime $aTime ) {
+                                 string $aPageURL, \DateTime $aTime ) {
         $vValue = json_encode([
             "pageTime" => $aPageTime,
             "location" => $aPageURL,
         ]);
 
-        return $this->addAction( Coimf_Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+        return $this->addAction( \Coimf\Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
     }
 
-    public static function fromAction( stdClass $aActionObject ) {
+    public static function fromAction( \stdClass $aActionObject ) {
         $vNewObject = clone $aActionObject;
         $vNewObject->value = json_decode( $aActionObject->value );
 
-        $vNewObject->time_start = DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_start );
-        $vNewObject->time_end = DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_end );
+        $vNewObject->time_start = \DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_start );
+        $vNewObject->time_end = \DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_end );
         // switch( intval( $aActionObject->action_type ) ) {
-        //     case Coimf_Action_Type::Click: {
+        //     case \Coimf\Action_Type::Click: {
         //     }
         // }
         return $vNewObject;
@@ -239,8 +241,10 @@ class Coimf_Action {
     }
 
     private string $mPluginName;
-    private Coimf_Logger $mLogger;
+    private \Coimf\Logger $mLogger;
     private const cAPIVersion = "v1";
     private const cActionTimestampFormat = "Y-m-d H:i:s";
+
+}
 
 }

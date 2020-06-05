@@ -43,7 +43,7 @@ define( "COIMF_NAME", "Coimf" );
  */
 function activate_Coimf() {
 	require_once plugin_dir_path( __FILE__ ) . "includes/class-coimf-activator.php";
-	Coimf_Activator::activate();
+	\Coimf\Activator::activate();
 }
 
 /**
@@ -52,7 +52,7 @@ function activate_Coimf() {
  */
 function deactivate_Coimf() {
 	require_once plugin_dir_path( __FILE__ ) . "includes/class-coimf-deactivator.php";
-	Coimf_Deactivator::deactivate();
+	\Coimf\Deactivator::deactivate();
 }
 
 register_activation_hook( __FILE__, "activate_Coimf" );

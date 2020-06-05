@@ -1,6 +1,8 @@
 <?php
 
-class Comf_Tracker {
+namespace Coimf {
+
+class Tracker {
     protected static $mInstance;
 
     public function __construct() {
@@ -14,6 +16,8 @@ class Comf_Tracker {
             return self::$mInstance;
         }
 
-        return new Comf_Tracker();
+        return new self();
     }
+}
+
 }

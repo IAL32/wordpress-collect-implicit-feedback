@@ -1,6 +1,8 @@
 <?php
 
-class Coimf_Public {
+namespace Coimf {
+
+class Public_Handler {
 
 	/**
 	 * The ID of this plugin.
@@ -33,7 +35,7 @@ class Coimf_Public {
 
 		$this->mPluginName = $aPluginName;
 		$this->mVersion = $aVersion;
-		$this->mCookie = Coimf_Cookie::getCookie();
+		$this->mCookie = \Coimf\Cookie::getCookie();
 
 	}
 
@@ -122,8 +124,8 @@ class Coimf_Public {
 
 		// FIXME: this should not be instantiated every time. Find a better way
 		// to access members from Coimf class
-		$vAction = new Coimf_Action( $this->mPluginName );
-		$vAction->addInternalLinkAction( $this->mCookie->getGUID(), $this->mCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new DateTime( "now" ) );
+		$vAction = new \Coimf\Action( $this->mPluginName );
+		$vAction->addInternalLinkAction( $this->mCookie->getGUID(), $this->mCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new \DateTime( "now" ) );
 	}
 
 	private function isPageRefresh() {
@@ -137,3 +139,4 @@ class Coimf_Public {
 
 }
 
+}

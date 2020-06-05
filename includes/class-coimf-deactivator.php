@@ -1,9 +1,13 @@
 <?php
 
-class Coimf_Deactivator {
+namespace Coimf {
+
+class Deactivator {
 
 	public static function deactivate() {
 		
 	}
+
+}
 
 }

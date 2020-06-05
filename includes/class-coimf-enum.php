@@ -1,7 +1,10 @@
 <?php
 
 // https://stackoverflow.com/a/254543
-abstract class Coimf_Enum {
+namespace Coimf {
+
+abstract class Enum {
+
     private static $cConstCacheArray = NULL;
 
     private static function getConstants() {
@@ -10,7 +13,7 @@ abstract class Coimf_Enum {
         }
         $vCalledClass = get_called_class();
         if ( !array_key_exists( $vCalledClass, self::$cConstCacheArray ) ) {
-            $vReflect = new ReflectionClass( $vCalledClass );
+            $vReflect = new \ReflectionClass( $vCalledClass );
             self::$cConstCacheArray[$vCalledClass] = $vReflect->getConstants();
         }
         return self::$cConstCacheArray[$vCalledClass];
@@ -31,4 +34,6 @@ abstract class Coimf_Enum {
         $vValues = array_values( self::getConstants() );
         return in_array( $aValue, $vValues, $aStrict );
     }
+}
+
 }

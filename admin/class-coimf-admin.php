@@ -1,6 +1,8 @@
 <?php
 
-class Coimf_Admin {
+namespace Coimf {
+
+class Admin_Handler {
 
 	/**
 	 * The ID of this plugin.
@@ -112,5 +114,7 @@ class Coimf_Admin {
 		echo '<p>These settings apply to all Coimf functionality.</p>';
 		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-settings.php" );
 	}
+
+}
 
 }

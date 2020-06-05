@@ -1,6 +1,8 @@
 <?php
 
-class Coimf_Loader {
+namespace Coimf {
+
+class Loader {
 
 	/**
 	 * The array of actions registered with WordPress.
@@ -104,5 +106,7 @@ class Coimf_Loader {
 		}
 
 	}
+
+}
 
 }

@@ -1,6 +1,8 @@
 <?php
 
-class Coimf_Cookie {
+namespace Coimf {
+
+class Cookie {
 
     public function __serialize() : array {
         return [
@@ -20,7 +22,7 @@ class Coimf_Cookie {
 
     public function __toString() {
         return sprintf(
-            "Coimf_Cookie( %1\$s = %2\$s; %3\$s = %4\$s; %5\$s = %6\$s; %7\$s = %8\$s )",
+            "\Coimf\Cookie( %1\$s = %2\$s; %3\$s = %4\$s; %5\$s = %6\$s; %7\$s = %8\$s )",
             "mGUID", $this->mGUID,
             "mSession", $this->mSession,
             "mTimeStart", $this->mTimeStart->format( self::cTimestampFormat ),
@@ -38,16 +40,16 @@ class Coimf_Cookie {
         return sprintf( "%04X%04X-%04X-%04X-%04X-%04X%04X%04X", ...$vRand);
     }
 
-    public static function getCookie() : Coimf_Cookie {
+    public static function getCookie() : \Coimf\Cookie {
         $vCookie = [];
-        $vCurrentTime = new DateTime( "now" );
+        $vCurrentTime = new \DateTime( "now" );
 
         if ( ! COIMF_COOKIE_FORCE && isset( $_COOKIE[self::cCookieName] ) &&
             self::isCookieValid( $_COOKIE[self::cCookieName] ) ) {
 
             $vExistingCookie = $_COOKIE[self::cCookieName];
 
-            $vTimeEndTime = DateTime::createFromFormat( self::cTimestampFormat, $vExistingCookie["time_end"] );
+            $vTimeEndTime = \DateTime::createFromFormat( self::cTimestampFormat, $vExistingCookie["time_end"] );
             
             if ( $vCurrentTime >= $vTimeEndTime ) {
                 $vSessionID = self::generateGUID();
@@ -55,7 +57,7 @@ class Coimf_Cookie {
             } else {
                 $vSessionID = $vExistingCookie["session_id"];
                 $vNewSessionExpireTime = clone $vCurrentTime;
-                $vNewSessionExpireTime->add( new DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
+                $vNewSessionExpireTime->add( new \DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
             }
 
             $vCookie = [
@@ -66,7 +68,7 @@ class Coimf_Cookie {
             ];
         } else {
             $vNewSessionExpireTime = clone $vCurrentTime;
-            $vNewSessionExpireTime->add( new DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
+            $vNewSessionExpireTime->add( new \DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
             $vCookie = [
                 "user_id"          => self::generateGUID(),
                 "session_id"       => self::generateGUID(),
@@ -75,7 +77,7 @@ class Coimf_Cookie {
             ];
         }
         $vNewCookieExpireTime = clone $vCurrentTime;
-        $vNewCookieExpireTime->add( new DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
+        $vNewCookieExpireTime->add( new \DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
         foreach( $vCookie as $vKey => $vValue ) {
             setcookie(
                 self::cCookieName . "[" . $vKey . "]",
@@ -95,21 +97,21 @@ class Coimf_Cookie {
         return $this->mSession;
     }
 
-    public function getTimeStart() : DateTime {
+    public function getTimeStart() : \DateTime {
         return $this->mTimeStart;
     }
 
-    public function getTimEnd() : DateTime {
+    public function getTimEnd() : \DateTime {
         return $this->mTimeEnd;
     }
 
     private function __construct( $aCookieArgs ) {
         $this->mGUID = $aCookieArgs["user_id"];
         $this->mSession = $aCookieArgs["session_id"];
-        $this->mTimeStart = DateTime::createFromFormat( self::cTimestampFormat, $aCookieArgs["time_start"] );
-        $this->mTimeEnd = DateTime::createFromFormat( self::cTimestampFormat, $aCookieArgs["time_end"] );
+        $this->mTimeStart = \DateTime::createFromFormat( self::cTimestampFormat, $aCookieArgs["time_start"] );
+        $this->mTimeEnd = \DateTime::createFromFormat( self::cTimestampFormat, $aCookieArgs["time_end"] );
 
-        $this->mLogger = new Coimf_Logger( "Coimf_Cookie" );
+        $this->mLogger = new \Coimf\Logger( "\Coimf\Cookie" );
     }
 
     private static function isCookieValid( array $aCookie ) {
@@ -125,10 +127,10 @@ class Coimf_Cookie {
 
     private string $mGUID;
     private string $mSession;
-    private DateTime $mTimeStart;
-    private DateTime $mTimeEnd;
+    private \DateTime $mTimeStart;
+    private \DateTime $mTimeEnd;
 
-    private Coimf_Logger $mLogger;
+    private \Coimf\Logger $mLogger;
 
     private const cCookieName = "coimf";
 
@@ -139,4 +141,6 @@ class Coimf_Cookie {
     public const cCookieExpireTime = 24 * 60 * 60;
 
     private const cTimestampFormat = "Y-m-d H:i:s e";
+}
+
 }

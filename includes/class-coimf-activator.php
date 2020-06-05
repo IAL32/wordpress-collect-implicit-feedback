@@ -1,6 +1,8 @@
 <?php
 
-class Coimf_Activator {
+namespace Coimf {
+
+class Activator {
 
 	public static function activate() {
 		self::createDataTable();
@@ -12,8 +14,8 @@ class Coimf_Activator {
 	}
 
 	private static function createDataTable() {
-		$vDB = Coimf_DB::getInstance();
-		$vLogger = new Coimf_Logger( "Coimf_Activator" );
+		$vDB = \Coimf\DB::getInstance();
+		$vLogger = new \Coimf\Logger( "Coimf_Activator" );
 
 		$vTableName = $vDB->getDataTableName();
 		if( $vDB->getVar( "show tables like '{$vTableName}'" ) != $vTableName ) {
@@ -23,8 +25,8 @@ class Coimf_Activator {
 				session_id VARCHAR(36) COMMENT 'GUID',
 				action_type INT unsigned NOT NULL,
 				value TEXT NOT NULL,
-				time_start DATETIME NOT NULL,
-				time_end DATETIME NOT NULL,
+				time_start \DateTime NOT NULL,
+				time_end \DateTime NOT NULL,
 				PRIMARY KEY  (id)
 			);";
 			require_once( ABSPATH . "/wp-admin/includes/upgrade.php" );
@@ -39,15 +41,17 @@ class Coimf_Activator {
 
 	public static function dropTables() {
 		global $wpdb;
-		$vTableNames[] = $wpdb->prefix . Coimf_DB::$cTablePrefix . Coimf_DB::$cDataTableName;
+		$vTableNames[] = $wpdb->prefix . \Coimf\DB::$cTablePrefix . \Coimf\DB::$cDataTableName;
 		foreach( $vTableNames as $vTableName ) {
 			$vQuery = "DROP TABLE IF EXISTS {$vTableName}";
 			if ( COIMF_DRY_UPDATE ) {
-				$vLogger = new Coimf_Logger( "Coimf_Activator" );
+				$vLogger = new \Coimf\Logger( "Coimf_Activator" );
 				$vLogger->log( 2, "::dropTables()", $vQuery );
 			} else {
 				$wpdb->query( $vQuery );
 			}
 		}
 	}
+}
+
 }

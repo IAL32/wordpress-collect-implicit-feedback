@@ -1,6 +1,8 @@
 <?php
 
-class Coimf_Logger {
+namespace Coimf {
+
+class Logger {
 
 // Public
 
@@ -92,13 +94,13 @@ class Coimf_Logger {
     private function openFile( $aPath, $aMode = "r" ) {
 
         if ( is_dir( $aPath ) ) {
-            throw new Exception( "Coimf_Logger::openFile(): file is a directory" );
+            throw new \Exception( "\Coimf\Logger::openFile(): file is a directory" );
         }
 
         $vHandle = fopen( $aPath, $aMode );
 
         if ( !$vHandle ) {
-            throw new Exception( "Coimf_Logger::openFile(): could not open file" );
+            throw new \Exception( "\Coimf\Logger::openFile(): could not open file" );
         }
 
         if ( ! file_exists( $aPath ) ) {
@@ -160,5 +162,7 @@ class Coimf_Logger {
 
     /** End line character for each log line */
     private string $mLogLineEndLine = "\n";
+
+}
 
 }
