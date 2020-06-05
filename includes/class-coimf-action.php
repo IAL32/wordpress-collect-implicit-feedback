@@ -101,24 +101,28 @@ class Action {
     }
 
     public static function getAllActions( array $aArgs = [] ) {
-        $vArgs = array_merge( $aArgs, [ "vLimitStart" => -1 ] );
+        $vArgs = array_merge( $aArgs, [ "vLimit" => -1 ] );
         return self::getActions( $vArgs );
     }
 
     public static function getActions( array $aArgs = [] ) {
 
         $vDefaults = [
-            "vLimitStart" => 20,
-            "vLimitEnd" => -1,
-            "vTimeStart" => 0,
-            "vTimeEnd" => 0,
-            "vSelect" => ["*"],
+            "vLimit"        => 20,
+            "vOffset"       => -1,
+            "vTimeStart"    => 0,
+            "vTimeEnd"      => 0,
+            "vOrderBy"      => "time_end",
+            "vOrder"        => "DESC",
+            "vSelect"       => ["*"],
         ];
 
         $vArgs = array_merge( $vDefaults, $aArgs );
         extract( $vArgs );
-        
-        $vSelect = implode( ",", $vSelect );
+
+        if ( is_array( $vSelect ) ) {
+            $vSelect = implode( ",", $vSelect );
+        }
 
         $vDB = \Coimf\DB::getInstance();
         $vTableName = $vDB->getDataTableName();
@@ -151,14 +155,21 @@ class Action {
             ", $vTimeStartDateTime, $vTimeEndDateTime );
         }
 
-        if ( $vLimitStart > -1 ) {
-            $vQuery .= " LIMIT {$vLimitStart}";
-            if ( $vLimitEnd > -1 ) {
-                $vQuery .= ", {$vLimitEnd}";
-            }
+        $vQuery .= " ORDER BY ${vOrderBy} {$vOrder}";
+
+        if ( $vLimit > -1 ) {
+            $vQuery .= " LIMIT {$vLimit}";
+        }
+        
+        if ( $vOffset > -1 ) {
+            $vQuery .= " OFFSET {$vOffset}";
         }
 
-        return $vDB->getResults( $vQuery );
+        if ( $vSelect == "COUNT(*)" ) {
+            return $vDB->getVar( $vQuery );
+        }
+
+        return $vDB->getResults( $vQuery, ARRAY_A );
     }
 
     // FIXME: require a \Coimf\Cookie instead of userGUID and session

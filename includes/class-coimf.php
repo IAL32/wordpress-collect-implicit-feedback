@@ -82,7 +82,13 @@ class Coimf {
 	 */
 	private function loadDependencies() {
 
+		// External
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-table.php";
+
+		// Helpers
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-enum.php";
+
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-action-table.php";
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-activator.php";
 

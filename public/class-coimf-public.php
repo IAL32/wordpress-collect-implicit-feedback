@@ -61,6 +61,14 @@ class Public_Handler {
 	 */
 	public function enqueueScripts() : void {
 
+		if ( is_admin() ) {
+			return;
+		}
+
+		if( current_user_can('editor') || current_user_can('administrator') ) { 
+			return;
+		}
+
 		$vCoimf = [
 			"mPluginName" => $this->mPluginName,
 			"mVersion" => $this->mVersion,
@@ -103,6 +111,16 @@ class Public_Handler {
 	}
 
 	private function refererAction() : void {
+
+		// not loggin in admin area
+		if ( is_admin() ) {
+			return;
+		}
+
+		// not loggin users that can edit posts or ar administrator
+		if( current_user_can('editor') || current_user_can('administrator') ) { 
+			return;
+		}
 
 		// page was refreshed
 		if ( $this->isPageRefresh() ) {

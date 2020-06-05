@@ -1,27 +1,18 @@
 <?php
-$vDB = \Coimf\DB::getInstance();
-
-$vActions = \Coimf\Action::getAllActions();
 
 ?>
 
-<table>
-<?php
-foreach ( $vActions as $vAction ) {
-    echo "<tr>";
-    $vParsedAction = \Coimf\Action::fromAction( $vAction );
-    echo ( sprintf(
-            "<td>%1\$s</td><td>%2\$s</td><td>%3\$s</td>",
-            $vParsedAction->id, $vParsedAction->user_id, $vParsedAction->session_id
-        ));
-    echo "</tr>";
-}
-?>
-</table>
+<div class="wrap">
 
-<input type="text" id="urlToCapture" />
-<button id="captureButton">Capture</button>
+    <h2><?php _e( "Actions", "coimf" ) ?></h2>
 
-<div id="captureOutput"></div>
+    <form method="GET">
+        <!-- <input type="hidden" name="page" value="<?php echo $_REQUEST["page"]; ?>" /> -->
+        <?php // $this->mActionsTable->search_box( __( 'Find', "coimf" ), 'coimf-action-find' ); ?>
+        <?php $this->mActionsTable->display(); ?>
+
+    </form>
+
+</div>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->

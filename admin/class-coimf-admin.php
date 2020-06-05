@@ -22,6 +22,8 @@ class Admin_Handler {
 	 */
 	private $mVersion;
 
+	private \Coimf\Action_Table $mActionsTable;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -56,7 +58,8 @@ class Admin_Handler {
 		 */
 
 		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . "css/coimf-admin.css", array(), $this->mVersion, "all" );
-
+		add_thickbox();
+		wp_enqueue_style( "thickbox.css", "/" . WPINC . "/js/thickbox/thickbox.css", null, "1.0" );
 	}
 
 	/**
@@ -78,7 +81,8 @@ class Admin_Handler {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->mPluginName, plugin_dir_url( __FILE__ ) . "assets/js/vendor/html2canvas.js", array( "jquery" ), $this->mVersion, false );
+		wp_enqueue_script( "thickbox", null, [ "jquery" ] );
+		wp_enqueue_script( "html2canvas", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/html2canvas.min.js", array( "jquery" ), $this->mVersion, false );
 
 	}
 
@@ -87,7 +91,7 @@ class Admin_Handler {
 	}
 
 	public function addMenuPage() {
-		add_menu_page(
+		$vMenuPageHook = add_menu_page(
 			$this->mPluginName,
 			"Track User Data",
 			"manage_options",
@@ -95,6 +99,8 @@ class Admin_Handler {
 			[ $this, "mainPage" ],
 			COIMF_ROOT_URL . "icon.ico"
 		);
+
+		add_action( "load-${vMenuPageHook}", [ $this, "initActionsTable" ] );
 
 		add_submenu_page(
 			"coimf-admin-display",
@@ -106,7 +112,21 @@ class Admin_Handler {
 		);
 	}
 
+	public function initActionsTable() {
+		$this->mActionsTable = new \Coimf\Action_Table();
+	}
+
 	public function mainPage() {
+
+		
+		add_screen_option( "per_page", [
+			"label"		=> __( "Actions per page", "coimf" ),
+			"default"	=> 5,
+			"option"	=> "actions_per_page"
+		]);
+
+		$this->mActionsTable->prepare_items();
+
 		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-display.php" );
 	}
 
