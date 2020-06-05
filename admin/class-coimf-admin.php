@@ -82,12 +82,14 @@ class Admin_Handler {
 		 */
 
 		wp_enqueue_script( "thickbox", null, [ "jquery" ] );
-		wp_enqueue_script( "html2canvas", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/html2canvas.min.js", array( "jquery" ), $this->mVersion, false );
+		wp_enqueue_script( "d3js-v5", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/d3js.v5.min.js", [ "jquery" ], $this->mVersion, false );
+		wp_enqueue_script( "html2canvas", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/html2canvas.min.js", [ "jquery" ], $this->mVersion, false );
 
 	}
 
 	public function registerSettings() {
 		register_setting("coimf-settings-group", "coimf_track_page_selector");
+		register_setting("coimf-settings-group", "coimf_track_user_clicks");
 	}
 
 	public function addMenuPage() {
@@ -116,9 +118,7 @@ class Admin_Handler {
 		$this->mActionsTable = new \Coimf\Action_Table();
 	}
 
-	public function mainPage() {
-
-		
+	public function mainPage() {		
 		add_screen_option( "per_page", [
 			"label"		=> __( "Actions per page", "coimf" ),
 			"default"	=> 5,

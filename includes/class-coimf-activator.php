@@ -11,6 +11,7 @@ class Activator {
 
 	private static function initializeOptions() {
 		add_option( "coimf_track_page_selector", ".post .entry-content" );
+		add_option( "coimf_track_user_clicks", "1" );
 	}
 
 	private static function createDataTable() {
