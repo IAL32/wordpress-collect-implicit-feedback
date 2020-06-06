@@ -27,8 +27,8 @@ class Activator {
 				session_id VARCHAR(36) COMMENT 'GUID',
 				action_type INT unsigned NOT NULL,
 				value TEXT NOT NULL,
-				time_start \DateTime NOT NULL,
-				time_end \DateTime NOT NULL,
+				time_start DateTime NOT NULL,
+				time_end DateTime NOT NULL,
 				PRIMARY KEY  (id)
 			);";
 			require_once( ABSPATH . "/wp-admin/includes/upgrade.php" );
