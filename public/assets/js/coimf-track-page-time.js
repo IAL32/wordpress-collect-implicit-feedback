@@ -25,7 +25,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "/wp-json/coimf/v1/track-page-time/",
+                url: gCoimf.mSiteURL + "/wp-json/coimf/v1/track-page-time/",
                 data: {
                     "pageTime": vPageTime,
                     "pageLocation": window.location.pathname,

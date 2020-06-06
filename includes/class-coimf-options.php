@@ -33,6 +33,7 @@ class Options {
             // FIXME: use functions to have dynamically loaded constants for base functions
             "cMYSQLDateTimeFormat" => \Coimf\TimeFunctions::cMYSQLDateTimeFormat,
             "cJsMYSQLDateTimeFormat" => \Coimf\TimeFunctions::cJsMYSQLDateTimeFormat,
+            "mSiteURL"  => get_site_url(),
 		];
     }
 

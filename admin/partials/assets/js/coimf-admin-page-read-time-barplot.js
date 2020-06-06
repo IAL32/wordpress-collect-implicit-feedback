@@ -36,7 +36,7 @@
 
         $.ajax({
             type: "GET",
-            url: "/wp-json/coimf/v1/admin/get-actions/",
+            url: gCoimf.mSiteURL + "/wp-json/coimf/v1/admin/get-actions/",
             data: {
                 // FIXME: possible SQL injection
                 "select": [

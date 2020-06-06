@@ -7,8 +7,6 @@
     //     return;
     // }
 
-    console.log( gCoimf );
-
     let vClicked = false;
 
     function getDocumentFullHeight() {
@@ -32,7 +30,7 @@
         let vPageWidth = window.screen.width;
         let vPageHeight = window.screen.height;
 
-        $.post("/wp-json/coimf/v1/track-click/", {
+        $.post(gCoimf.mSiteURL + "/wp-json/coimf/v1/track-click/", {
             "mouseX": vPageX,
             "mouseY": vPageY,
             "resolutionX": vPageWidth,
