@@ -149,6 +149,15 @@ class Public_Handler {
 	}
 
 	private function isPageBeingTracked( string $aURL ) : bool {
+
+		$vForbiddenToTrackPages = \Coimf\Options::getForbiddenToTrackPages();
+
+		foreach ( $vForbiddenToTrackPages as $vForbiddenPage ) {
+			if ( strstr( $aURL, $vForbiddenPage ) ) {
+				return false;
+			}
+		}
+
 		$vTrackedPages = \Coimf\Options::getTrackedPages();
 
 		foreach ( $vTrackedPages as $vTrackedPage ) {
@@ -156,7 +165,7 @@ class Public_Handler {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 

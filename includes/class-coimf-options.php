@@ -14,6 +14,13 @@ class Options {
 
         return explode( self::cTrackedPagesGlue, $vTrackedPagesOption );
     }
+    
+    public static function getForbiddenToTrackPages() : array {
+        return [
+            "wp-cron.php",
+            "wp-admin",
+        ];
+    }
 
     public static function getGlobalCoimfOptions() {
         return [
