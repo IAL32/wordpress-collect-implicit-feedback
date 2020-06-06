@@ -42,22 +42,22 @@ class Cookie {
 
     public static function getCookie() : \Coimf\Cookie {
         $vCookie = [];
-        $vCurrentTime = new \DateTime( "now" );
+        $vCurrentTime = TimeFunctions::now();
+        $vNewSessionExpireTime = clone $vCurrentTime;
+        \Coimf\TimeFunctions::addSecondsToDateTime( $vNewSessionExpireTime, self::cSessionExpireTime );
 
-        if ( ! COIMF_COOKIE_FORCE && isset( $_COOKIE[self::cCookieName] ) &&
-            self::isCookieValid( $_COOKIE[self::cCookieName] ) ) {
+        if ( ! COIMF_COOKIE_FORCE && isset( $_COOKIE[self::cCookieName] ) && self::isCookieValid( $_COOKIE[self::cCookieName] ) ) {
 
             $vExistingCookie = $_COOKIE[self::cCookieName];
 
-            $vTimeEndTime = \DateTime::createFromFormat( self::cTimestampFormat, $vExistingCookie["time_end"] );
-            
-            if ( $vCurrentTime >= $vTimeEndTime ) {
-                $vSessionID = self::generateGUID();
-                $vNewSessionExpireTime = clone $vTimeEndTime;
-            } else {
+            $vCookieSessionTimeEnd = \DateTime::createFromFormat( self::cTimestampFormat, $vExistingCookie["time_end"] );
+
+            if ( self::isSessionValid( $vCurrentTime, $vCookieSessionTimeEnd ) ) {
                 $vSessionID = $vExistingCookie["session_id"];
-                $vNewSessionExpireTime = clone $vCurrentTime;
-                $vNewSessionExpireTime->add( new \DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
+                Logger::sLog( "Coimf_Cookie", 2, "Keeping old session ID: ", $vSessionID );
+            } else {
+                $vSessionID = self::generateGUID();
+                Logger::sLog( "Coimf_Cookie", 2, "Generating new session ID: ", $vSessionID );
             }
 
             $vCookie = [
@@ -66,9 +66,8 @@ class Cookie {
                 "time_start"    => $vExistingCookie["time_start"],
                 "time_end"      => $vNewSessionExpireTime->format( self::cTimestampFormat ),
             ];
+
         } else {
-            $vNewSessionExpireTime = clone $vCurrentTime;
-            $vNewSessionExpireTime->add( new \DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
             $vCookie = [
                 "user_id"          => self::generateGUID(),
                 "session_id"       => self::generateGUID(),
@@ -76,8 +75,10 @@ class Cookie {
                 "time_end"      => $vNewSessionExpireTime->format( self::cTimestampFormat ),
             ];
         }
+
         $vNewCookieExpireTime = clone $vCurrentTime;
-        $vNewCookieExpireTime->add( new \DateInterval( "PT" . self::cCookieExpireTime . "S" ) );
+        \Coimf\TimeFunctions::addSecondsToDateTime( $vNewCookieExpireTime, self::cCookieExpireTime );
+
         foreach( $vCookie as $vKey => $vValue ) {
             setcookie(
                 self::cCookieName . "[" . $vKey . "]",
@@ -87,6 +88,22 @@ class Cookie {
         }
 
         return new self( $vCookie );
+    }
+
+    /**
+     * A session is considered to be valid when the current time is in the past
+     * with respect to the session end time.
+     */
+    private static function isSessionValid( \DateTime $aCurrentTime, \DateTime $aSessionEndTime ) : bool {
+        $vValid = $aCurrentTime < $aSessionEndTime;
+        if ( $aCurrentTime < $aSessionEndTime ) {
+            Logger::sLog( "Coimf_Cookie", 2, "Session Valid: ");
+            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
+        } else {
+            Logger::sLog( "Coimf_Cookie", 2, "Session not valid");
+            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
+        }
+        return $vValid;
     }
 
     public function getGUID() : string {
@@ -135,7 +152,7 @@ class Cookie {
     private const cCookieName = "coimf";
 
     /** The maximum session duration, in seconds (default: 30 minutes) */
-    public const cSessionLength = 30 * 60;
+    public const cSessionExpireTime = 30 * 60;
 
     /** When the cookie expires, in seconds (default: 1 day) */
     public const cCookieExpireTime = 24 * 60 * 60;

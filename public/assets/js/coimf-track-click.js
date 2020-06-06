@@ -9,6 +9,8 @@
 
     console.log( gCoimf );
 
+    let vClicked = false;
+
     function getDocumentFullHeight() {
         var vBody = document.body,
             vHTML = document.documentElement;
@@ -18,6 +20,13 @@
     }
 
     $(document).click(function (aMouseClickEvent) {
+
+        if (vClicked) {
+            return;
+        }
+
+        vClicked = true;
+
         let vPageX = aMouseClickEvent.pageX;
         let vPageY = aMouseClickEvent.pageY;
         let vPageWidth = window.screen.width;

@@ -2,6 +2,14 @@
 
 namespace Coimf {
 
+class LogLevel extends Enum {
+    public const TRACE  = 0;
+    public const DEBUG  = 1;
+    public const INFO   = 2;
+    public const WARN   = 3;
+    public const ERROR   = 3;
+}
+
 class Logger {
 
 // Public
@@ -11,6 +19,16 @@ class Logger {
      */
     public function __construct( string $aLogGroup ) {
         $this->mLogGroup = $aLogGroup;
+    }
+
+    public static function sLog( string $aLogGroup, int $aLogLevel = 2  ) {
+        $vLogger = new self( $aLogGroup );
+        $vMessages = func_get_args();
+        // removing the first two arguments
+        array_shift( $vMessages );
+        array_shift( $vMessages );
+
+        $vLogger->log( $aLogLevel, ...$vMessages );
     }
 
     public function log( $aLogLevel = 2 ) {
