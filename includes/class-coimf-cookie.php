@@ -151,10 +151,10 @@ class Cookie {
     private const cCookieName = "coimf";
 
     /** The maximum session duration, in seconds (default: 30 minutes) */
-    public const cSessionExpireTime = 30 * 60;
+    public const cSessionExpireTime = HOUR_IN_SECONDS / 2;
 
     /** When the cookie expires, in seconds (default: 1 day) */
-    public const cCookieExpireTime = 24 * 60 * 60;
+    public const cCookieExpireTime = WEEK_IN_SECONDS;
 
     private const cTimestampFormat = "Y-m-d H:i:s e";
 }
