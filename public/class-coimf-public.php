@@ -124,6 +124,12 @@ class Public_Handler {
 			return;
 		}
 
+		// not logging self-referring navigation
+		// TODO: is this ok though?
+		if ( $vHTTPReferer == $vCurrentSlug ) {
+			return;
+		}
+
 		// FIXME: Action should not be instantiated every time. Find a better way
 		// to access this
 		// Maybe with $mLoader?
