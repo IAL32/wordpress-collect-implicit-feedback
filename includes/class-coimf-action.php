@@ -33,10 +33,24 @@ class Action {
                 "callback" => [ $this, "addPageTimeCallback" ]
             ]
         );
+        register_rest_route(
+            $this->mPluginName . "/" . self::cAPIVersion,
+            "/delete/",
+            [
+                "methods" => \WP_REST_Server::DELETABLE,
+                "callback" => [ $this, "deleteActionCallback" ],
+                "permission_callback" => function( \WP_REST_Request $aRequest ) {
+                    // FIXME: use nonces
+                    // FIXME: use dedicated function
+                    // FIXME: customizable roles
+                    return current_user_can( "administrator" );
+                }
+            ]
+        );
     }
 
     public function addClickPositionCallback( \WP_REST_Request $aRequest ) {
-        if ( is_admin() ) {
+        if ( is_admin() || current_user_can( "administrator" ) || current_user_can( "editor" ) ) {
             return new \WP_REST_Response( [ "message" => "Not logging admin clicks" ], 200 );
         }
 
@@ -67,7 +81,9 @@ class Action {
     }
 
     public function addPageTimeCallback( \WP_REST_Request $aRequest ) {
-        if ( is_admin() ) {
+        // TODO: create function for BaseFunctions where we can set an array of user
+        // roles
+        if ( is_admin() || current_user_can( "administrator" ) || current_user_can( "editor" ) ) {
             return new \WP_REST_Response( [ "message" => "Not logging admin times" ], 200 );
         }
 
@@ -76,7 +92,7 @@ class Action {
 
         $vCookie = \Coimf\Cookie::getCookie();
 
-        $vQueryResult = $this->addPageTime(
+        $this->addPageTime(
             $vCookie->getGUID(),
             $vCookie->getSession(),
             $vPageTime,
@@ -84,9 +100,20 @@ class Action {
             new \DateTime( "now" )
         );
 
-        $this->mLogger->log( 2, "::addPageTimeCallback()", var_export( $vQueryResult, true ) );
-
         return new \WP_REST_Response( [ "message" => "Click logged" ], 200 );
+    }
+
+    public function deleteActionCallback( \WP_REST_Request $aRequest ) {
+        // sanity check
+        if ( ! is_admin() && ( ! current_user_can( "administrator" ) || ! current_user_can( "editor" ) ) ) {
+            return new \WP_REST_Response( [ "message" => "User not allowed" ], 403 );
+        }
+
+        $vActionID = intval( $aRequest->get_param( "action_id" ) );
+
+        self::deleteAction( $vActionID );
+
+        return new \WP_REST_Response( [ "message" => "Item deleted" ], 200 );
     }
 
     public static function getAction( $aActionID ) {
@@ -94,7 +121,7 @@ class Action {
 
         $vTableName = $vDB->getDataTableName();
         $vQuery = $vDB->prepare(
-            "SELECT * FROM %s WHERE id = %s", $vTableName, $aActionID
+            "SELECT * FROM {$vTableName} WHERE id = %s", $aActionID
         );
 
         return $vDB->getRow( $vQuery );
@@ -160,23 +187,7 @@ class Action {
             ", $vTimeStartDateTime, $vTimeEndDateTime );
         }
 
-        if ( ! empty( $vFilter ) ) {
-            // Necessary 1=1 in order to have simpler AND concatenation of rules
-            $vWhereQuery = " WHERE 1=1";
-            $vWhereQueryPresent = false;
-            foreach ( $vFilter as $vFilterColumn => $vColumnValue ) {
-                if ( $vColumnValue === false ) {
-                    continue;
-                }
-
-                $vWhereQuery .= " AND {$vFilterColumn} {$vColumnValue}";
-                $vWhereQueryPresent = true;
-            }
-
-            if ( $vWhereQueryPresent ) {
-                $vQuery .= $vWhereQuery;
-            }
-        }
+        $vQuery .= \Coimf\DB::whereFromArgs( $vFilter );
 
         $vQuery .= " ORDER BY ${vOrderBy} {$vOrder}";
 
@@ -193,6 +204,41 @@ class Action {
         }
 
         return $vDB->getResults( $vQuery, ARRAY_A );
+    }
+
+    public static function deleteAction( int $aActionID ) {
+        return self::deleteActions([
+            "vFilter" => [
+                "id"    => "= {$aActionID}"
+            ]
+        ]);
+    }
+
+    public static function deleteActions( array $aArgs = [] ) {
+        $vDefaults = [
+            "vFilter"       => [
+                // FIXME: value needs to be a value, so we can set multiple
+                // filters for each column
+                // "action_type"   => false,
+            ],
+        ];
+
+        $vArgs = array_merge( $vDefaults, $aArgs );
+        extract( $vArgs );
+
+        $vDB = \Coimf\DB::getInstance();
+        $vTableName = $vDB->getDataTableName();
+
+        $vQuery = "DELETE FROM {$vTableName}";
+
+        $vQuery .= \Coimf\DB::whereFromArgs( $vFilter );
+
+        if ( COIMF_DRY_UPDATE ) {
+            Logger::sLog( "Coimf_Action", 2, "::addAction()", $vQuery );
+            return true;
+        }
+
+        return $vDB->query( $vQuery );
     }
 
     // FIXME: require a \Coimf\Cookie instead of userGUID and session

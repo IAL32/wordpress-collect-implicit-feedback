@@ -48,6 +48,28 @@ class DB {
         return $this->mWPDB->get_row( ...func_get_args() );
     }
 
+    public static function whereFromArgs( array $vFilter = [] ) {
+        if ( ! empty( $vFilter ) ) {
+            // Necessary 1=1 in order to have simpler AND concatenation of rules
+            $vWhereQuery = " WHERE 1=1";
+            $vWhereQueryPresent = false;
+            foreach ( $vFilter as $vFilterColumn => $vColumnValue ) {
+                if ( $vColumnValue === false ) {
+                    continue;
+                }
+
+                $vWhereQuery .= " AND {$vFilterColumn} {$vColumnValue}";
+                $vWhereQueryPresent = true;
+            }
+
+            if ( $vWhereQueryPresent ) {
+                return $vWhereQuery;
+            }
+        }
+
+        return "";
+    }
+
 // Private
 
     private function __construct() {

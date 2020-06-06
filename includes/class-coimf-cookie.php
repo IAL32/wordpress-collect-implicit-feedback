@@ -90,22 +90,6 @@ class Cookie {
         return new self( $vCookie );
     }
 
-    /**
-     * A session is considered to be valid when the current time is in the past
-     * with respect to the session end time.
-     */
-    private static function isSessionValid( \DateTime $aCurrentTime, \DateTime $aSessionEndTime ) : bool {
-        $vValid = $aCurrentTime < $aSessionEndTime;
-        if ( $aCurrentTime < $aSessionEndTime ) {
-            Logger::sLog( "Coimf_Cookie", 2, "Session Valid: ");
-            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
-        } else {
-            Logger::sLog( "Coimf_Cookie", 2, "Session not valid");
-            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
-        }
-        return $vValid;
-    }
-
     public function getGUID() : string {
         return $this->mGUID;
     }
@@ -142,12 +126,26 @@ class Cookie {
         return count( $vKeys ) === $vCount;
     }
 
+    /**
+     * A session is considered to be valid when the current time is in the past
+     * with respect to the session end time.
+     */
+    private static function isSessionValid( \DateTime $aCurrentTime, \DateTime $aSessionEndTime ) : bool {
+        $vValid = $aCurrentTime < $aSessionEndTime;
+        if ( $aCurrentTime < $aSessionEndTime ) {
+            Logger::sLog( "Coimf_Cookie", 2, "Session Valid: ");
+            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
+        } else {
+            Logger::sLog( "Coimf_Cookie", 2, "Session not valid");
+            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
+        }
+        return $vValid;
+    }
+
     private string $mGUID;
     private string $mSession;
     private \DateTime $mTimeStart;
     private \DateTime $mTimeEnd;
-
-    private \Coimf\Logger $mLogger;
 
     private const cCookieName = "coimf";
 

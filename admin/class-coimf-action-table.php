@@ -17,6 +17,7 @@ class Action_Table extends External\WP_List_Table {
             "session_id"        => __( "Session GUID", "coimf" ),
             "time_start"        => __( "Time Start", "coimf" ),
             "time_end"          => __( "Time End", "coimf" ),
+            "item_actions"      => __( "Item Actions", "coimf" ),
         ];
 
         return $vTableColumns;
@@ -40,6 +41,8 @@ class Action_Table extends External\WP_List_Table {
             case "user_id":
             case "session_id":
                 return substr( $aItem[$aColumn], 0, 6 ) . "&hellip;";
+            case "item_actions":
+                return "";
             default:
                 return $aItem[$aColumn];
         }
