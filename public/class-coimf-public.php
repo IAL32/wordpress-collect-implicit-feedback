@@ -24,6 +24,8 @@ class Public_Handler {
 
 	private $mCookie;
 
+	private \Coimf\Logger $mLogger;
+
 	/**
 	 * Initialize the class and set its properties.
 	 *
@@ -36,6 +38,7 @@ class Public_Handler {
 		$this->mPluginName = $aPluginName;
 		$this->mVersion = $aVersion;
 		$this->mCookie = \Coimf\Cookie::getCookie();
+		$this->mLogger = new \Coimf\Logger( "Coimf_Public" );
 
 	}
 
@@ -65,7 +68,7 @@ class Public_Handler {
 			return;
 		}
 
-		if( current_user_can('editor') || current_user_can('administrator') ) { 
+		if( current_user_can( 'editor' ) || current_user_can( 'administrator' ) ) { 
 			return;
 		}
 
@@ -97,6 +100,7 @@ class Public_Handler {
 		);
 		wp_localize_script( "coimf-track-click", "gCoimf", $vCoimf);
 
+		// only tracking page time on articles
 		if ( is_single() ) {
 			wp_enqueue_script(
 				"coimf-track-page-time",
@@ -138,21 +142,53 @@ class Public_Handler {
 			return;
 		}
 
-		$vCurrentSlug = "/" . add_query_arg( [], $wp->request );
+		$vCurrentSlug = $_SERVER["REQUEST_URI"];
 
-		// FIXME: this should not be instantiated every time. Find a better way
-		// to access members from Coimf class
+		if ( ! $this->isURLExternal( $vHTTPReferer ) ) {
+			// trimming referrer to just get the path
+			$vHTTPReferer = parse_url( $vHTTPReferer, PHP_URL_PATH );
+		}
+
+		$this->mLogger->log( 2, $vHTTPReferer, ";", $vCurrentSlug );
+
+		$this->mLogger->log( 2, "Is being tracked:", var_export( $this->isPageBeingTracked( $vCurrentSlug ), true ) );
+
+		if ( ! $this->isPageBeingTracked( $vCurrentSlug ) ) {
+			return;
+		}
+
+		// FIXME: Action should not be instantiated every time. Find a better way
+		// to access this
 		$vAction = new \Coimf\Action( $this->mPluginName );
 		$vAction->addInternalLinkAction( $this->mCookie->getGUID(), $this->mCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new \DateTime( "now" ) );
 	}
 
-	private function isPageRefresh() {
+	private function isURLExternal( string $aURL ) : bool {
+		$vURLComponents = parse_url( $aURL );    
+		// empty host will indicate url like '/relative.php'
+		return !empty( $vURLComponents['host'] )
+				&& strcasecmp( $vURLComponents['host'], $_SERVER["SERVER_NAME"] );
+	}
+
+	private function isPageRefresh() : bool {
 		return isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] == 'max-age=0';
 	}
 
-	private function isRequestAjax() {
+	private function isRequestAjax() : bool {
 		return !empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 
 				strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest';
+	}
+
+	private function isPageBeingTracked( string $aURL ) : bool {
+		$vTrackedPages = \Coimf\Options::getTrackedPages();
+
+		foreach ( $vTrackedPages as $vTrackedPage ) {
+			if ( substr( $aURL, 0, strlen( $vTrackedPage ) ) == $vTrackedPage ) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 }

@@ -88,6 +88,8 @@ class Coimf {
 		// Helpers
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-enum.php";
 
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-options.php";
+
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-action-table.php";
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "includes/class-coimf-activator.php";

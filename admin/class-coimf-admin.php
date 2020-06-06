@@ -88,8 +88,12 @@ class Admin_Handler {
 	}
 
 	public function registerSettings() {
-		register_setting("coimf-settings-group", "coimf_track_page_selector");
-		register_setting("coimf-settings-group", "coimf_track_user_clicks");
+		register_setting( "coimf-settings-group", "coimf-track-page-selector" );
+		register_setting( "coimf-settings-group", "coimf-track-user-clicks" );
+		register_setting( "coimf-settings-group", "coimf-track-slug" );
+		add_option( "coimf-track-page-selector", ".post .entry-content" );
+		add_option( "coimf-track-user-clicks", "1" );
+		add_option( "coimf-track-slug", "/" );
 	}
 
 	public function addMenuPage() {
