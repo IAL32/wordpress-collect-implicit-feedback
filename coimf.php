@@ -5,7 +5,7 @@
  * Description:       Collects user navigation data
  * Version:           1.0.0
  * Requires at least: 5.4
- * Requires PHP:      7.0
+ * Requires PHP:      7.4
  * Author:            Adrian Castro
  * Author URI:        https://github.com/IAL32
  * License:           GPL v3 or later
