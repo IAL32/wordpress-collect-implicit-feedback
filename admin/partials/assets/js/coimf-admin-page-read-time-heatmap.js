@@ -2,12 +2,12 @@
 
     $(document).ready(function () {
         // set the dimensions and margins of the graph
-        var vMargin = { mTop: 30, mRight: 30, mBottom: 30, mLeft: 50 },
+        var vMargin = { mTop: 30, mRight: 100, mBottom: 50, mLeft: 50 },
             vWidth = 450 - vMargin.mLeft - vMargin.mRight,
             vHeight = 450 - vMargin.mTop - vMargin.mBottom;
 
-        var vTimeEnd = moment();
-        var vTimeStart = moment().subtract(1, "week");
+        let vTimeStart = moment().subtract(7, "days");
+        let vTimeEnd = moment();
 
         // append the svg object to the body of the page
         var svg = d3.select("#scroll-time-heatmap")
@@ -19,7 +19,11 @@
                 "translate(" + vMargin.mLeft + "," + vMargin.mTop + ")");
 
         // Labels of row and columns
-        let vWeekDays = moment.weekdays();
+        let vWeekDays = []
+        for (let vIdx = 0; vIdx < 7; vIdx++) {
+            vWeekDays.push(moment().subtract(7 - vIdx, "days").format("DD/MM"));
+        }
+
         let vHoursInDay = [];
         for (let vIdx = 23; vIdx >= 0; vIdx--) {
             vHoursInDay.push(vIdx.pad() + ":00");
@@ -33,6 +37,9 @@
         svg.append("g")
             .attr("transform", "translate(0," + vHeight + ")")
             .call(d3.axisBottom(vXAxis))
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end")
 
         // Build X scales and axis:
         var vYAxis = d3.scaleBand()
@@ -42,27 +49,53 @@
         svg.append("g")
             .call(d3.axisLeft(vYAxis));
 
-        // Build color scale
-        var vColor = d3.scaleLinear()
-            .range(["white", "#69b3a2"])
-            .domain([1, 100])
-
         $.ajax({
             type: "GET",
             url: gCoimf.mSiteURL + "/wp-json/coimf/v1/admin/get-actions/",
             data: {
                 // FIXME: possible SQL injection
+                "select": [
+                    "time_start",
+                    "SUM(JSON_EXTRACT(value, \"$.pageTime\")) as page_time_sum",
+                ],
                 "filter": {
-                    "action_type":  "= " + 2,
-                    "time_start":   ">= '" + vTimeStart.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
-                    "time_end":     "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
-                }
+                    "action_type": "= " + 2,
+                    "time_start": ">= '" + vTimeStart.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
+                    "time_end": "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
+                },
+                "groupby": [
+                    "hour( time_start )",
+                    "day( time_start )",
+                ]
             },
-            beforeSend: function(aXhr) {
+            beforeSend: function (aXhr) {
                 aXhr.setRequestHeader("X-WP-Nonce", cNonce);
             },
         }).then(function (aResponse) {
             let vData = aResponse.data;
+
+            var vDataMax = d3.max(vData, function (aItem) {
+                return +aItem.page_time_sum;
+            });
+
+            // Build color scale
+            var vColor = d3.scaleLinear()
+                .range(["white", "#69b3a2"])
+                .domain([0, vDataMax])
+
+            // Adding legend
+            svg.append("g")
+                .attr("class", "legendLinear")
+                .attr("transform", "translate(" + (vWidth + 20) + ", " + vMargin.mTop + ")");
+
+            var legendLinear = d3.legendColor()
+                .shapeWidth(30)
+                .title("Seconds")
+                .orient("vertical")
+                .scale(vColor);
+
+            svg.select(".legendLinear")
+                .call(legendLinear);
 
             svg.selectAll()
                 .data(vData, function (aItem) {
@@ -71,7 +104,7 @@
                 .enter()
                 .append("rect")
                 .attr("x", function (aItem) {
-                    let vItemTimeStart = moment(aItem.time_start).format("dddd");
+                    let vItemTimeStart = moment(aItem.time_start).format("DD/MM");
                     return vXAxis(vItemTimeStart);
                 })
                 .attr("y", function (aItem) {
@@ -81,8 +114,8 @@
                 .attr("width", vXAxis.bandwidth())
                 .attr("height", vYAxis.bandwidth())
                 .style("fill", function (aItem) {
-                    let vItemValueParsed = JSON.parse(aItem.value);
-                    return vColor(vItemValueParsed.pageTime)
+                    let vItemValue = JSON.parse(aItem.page_time_sum);
+                    return vColor(vItemValue);
                 });
         });
     });

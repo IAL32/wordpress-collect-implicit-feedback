@@ -60,7 +60,8 @@ class Admin_Handler {
 		 */
 
 		wp_enqueue_script( "thickbox", null, [ "jquery" ] );
-		wp_enqueue_script( "d3js-v5", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/d3js.v4.min.js", [ "jquery" ], "4.0.0", false );
+		wp_enqueue_script( "d3js-v4", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/d3js.v4.min.js", [ "jquery" ], "4.0.0", false );
+		wp_enqueue_script( "d3-legend", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/d3-legend.min.js", [ "jquery", "d3js-v4" ], "2.25.6", false );
 		wp_enqueue_script( "html2canvas", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/html2canvas.min.js", [ "jquery" ], "1.0.0-rc5", false );
 		wp_enqueue_script( "moment", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/moment.min.js", [ "jquery" ], "2.26.0", false );
 

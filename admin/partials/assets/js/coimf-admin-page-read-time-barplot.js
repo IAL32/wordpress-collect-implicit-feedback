@@ -7,8 +7,8 @@
             vWidth = 450 - vMargin.mLeft - vMargin.mRight,
             vHeight = 450 - vMargin.mTop - vMargin.mBottom;
 
+        var vTimeStart = moment().subtract(7, "days");
         var vTimeEnd = moment();
-        var vTimeStart = moment().subtract(1, "week");
 
         // append the svg object to the body of the page
         var svg = d3.select("#scroll-time-barplot")
@@ -64,7 +64,7 @@
 
             // Build Y scales and axis:
             let vYAxis = d3.scaleLinear()
-                .domain([0, vDataMax]) // FIXME: smarter domain range
+                .domain([0, vDataMax])
                 .range([vHeight, 0]);
             svg.append("g")
                 .call(d3.axisLeft(vYAxis));
