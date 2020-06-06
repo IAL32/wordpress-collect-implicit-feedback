@@ -28,7 +28,7 @@ class Options {
 			"mVersion" => COIMF_VERSION,
 			"mIsUserAdmin" => is_admin() ? "true" : "false",
 			"mSettings" => [
-				"mPageTrackSelector" => get_option( "coimf_track_page_selector" ),
+				"mPageTrackSelector" => get_option( "coimf-track-page-selector" ),
             ],
             // FIXME: use functions to have dynamically loaded constants for base functions
             "cMYSQLDateTimeFormat" => \Coimf\TimeFunctions::cMYSQLDateTimeFormat,
