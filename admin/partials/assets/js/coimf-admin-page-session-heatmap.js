@@ -10,7 +10,7 @@
         let vTimeEnd = moment();
 
         // append the svg object to the body of the page
-        var svg = d3.select("#scroll-time-heatmap")
+        var svg = d3.select("#session-heatmap")
             .append("svg")
             .attr("width", vWidth + vMargin.mLeft + vMargin.mRight)
             .attr("height", vHeight + vMargin.mTop + vMargin.mBottom)
@@ -56,16 +56,15 @@
                 // FIXME: possible SQL injection
                 "select": [
                     "time_start",
-                    "SUM(JSON_EXTRACT(value, \"$.pageTime\")) as page_time_sum",
+                    "COUNT(session_id) as session_count",
                 ],
                 "filter": {
-                    "action_type": "= " + 2,
                     "time_start": ">= '" + vTimeStart.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
                     "time_end": "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
                 },
                 "groupby": [
-                    "hour( time_start )",
-                    "day( time_start )",
+                    "day(time_start)",
+                    "hour(time_start)",
                 ],
                 "limit": -1,
                 "offset": -1,
@@ -77,7 +76,7 @@
             let vData = aResponse.data;
 
             var vDataMax = d3.max(vData, function (aItem) {
-                return +aItem.page_time_sum;
+                return +aItem.session_count;
             });
 
             // Build color scale
@@ -114,7 +113,7 @@
                 .attr("width", vXAxis.bandwidth())
                 .attr("height", vYAxis.bandwidth())
                 .style("fill", function (aItem) {
-                    return vColor(aItem.page_time_sum);
+                    return vColor(aItem.session_count);
                 });
         });
     });

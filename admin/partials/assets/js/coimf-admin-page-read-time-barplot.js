@@ -50,7 +50,9 @@
                 },
                 "groupby": [
                     "CAST(time_start AS DATE)"
-                ]
+                ],
+                "limit": -1,
+                "offset": -1,
             },
             beforeSend: function (aXhr) {
                 aXhr.setRequestHeader("X-WP-Nonce", cNonce);

@@ -133,11 +133,15 @@ class Action {
         $vSelect = $aRequest->get_param( "select" );
         $vFilter = $aRequest->get_param( "filter" );
         $vGroupBy = $aRequest->get_param( "groupby" );
+        $vLimit = $aRequest->get_param( "limit" );
+        $vOffset = $aRequest->get_param( "offset" );
 
         $vActions = self::getActions([
-            "vSelect" => $vSelect,
-            "vFilter" => $vFilter,
-            "vGroupBy" => $vGroupBy,
+            "vSelect"   => $vSelect,
+            "vFilter"   => $vFilter,
+            "vGroupBy"  => $vGroupBy,
+            "vLimit"    => $vLimit,
+            "vOffset"   => $vOffset,
         ]);
 
         return new \WP_REST_Response([
