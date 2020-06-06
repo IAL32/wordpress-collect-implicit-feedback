@@ -16,10 +16,10 @@
 
 defined( "WPINC" ) || die;
 
-/**
- * In the debug status, the plugin will not make any permanent changes.
- */
-define( "COIMF_DEBUG", true );
+// see \Coimf\LogLevel in includes/class-coimf-logger.php
+// FIXME: this has to be a changeable option
+// Default: INFO
+define( "COIMF_DEBUG", 4 );
 define( "COIMF_DRY_UPDATE", false );
 define( "COIMF_COOKIE_FORCE", false );
 

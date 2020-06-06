@@ -116,9 +116,9 @@ class Public_Handler {
 			$vHTTPReferer = parse_url( $vHTTPReferer, PHP_URL_PATH );
 		}
 
-		$this->mLogger->log( 2, $vHTTPReferer, ";", $vCurrentSlug );
+		$this->mLogger->log( LogLevel::INFO, $vHTTPReferer, ";", $vCurrentSlug );
 
-		$this->mLogger->log( 2, "Is being tracked:", var_export( $this->isPageBeingTracked( $vCurrentSlug ), true ) );
+		$this->mLogger->log( LogLevel::INFO, "Is being tracked:", var_export( $this->isPageBeingTracked( $vCurrentSlug ), true ) );
 
 		if ( ! $this->isPageBeingTracked( $vCurrentSlug ) ) {
 			return;

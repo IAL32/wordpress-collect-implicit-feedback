@@ -33,10 +33,10 @@ class Activator {
 			);";
 			require_once( ABSPATH . "/wp-admin/includes/upgrade.php" );
 			if ( COIMF_DRY_UPDATE ) {
-				$vLogger->log( 2, "::createDataTable()", $vSql );
+				$vLogger->log( LogLevel::INFO, "::createDataTable()", $vSql );
 			} else {
 				$vExecResult = dbDelta( $vSql );
-				$vLogger->log( 2, "::createDataTable()", var_export( $vExecResult, true ) );
+				$vLogger->log( LogLevel::INFO, "::createDataTable()", var_export( $vExecResult, true ) );
 			}
 		}
 	}
@@ -47,8 +47,7 @@ class Activator {
 		foreach( $vTableNames as $vTableName ) {
 			$vQuery = "DROP TABLE IF EXISTS {$vTableName}";
 			if ( COIMF_DRY_UPDATE ) {
-				$vLogger = new \Coimf\Logger( "Coimf_Activator" );
-				$vLogger->log( 2, "::dropTables()", $vQuery );
+				\Coimf\Logger::sLog( "Coimf_Activator", LogLevel::INFO, "::dropTables()", $vQuery );
 			} else {
 				$wpdb->query( $vQuery );
 			}

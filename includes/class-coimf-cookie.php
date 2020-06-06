@@ -54,10 +54,10 @@ class Cookie {
 
             if ( self::isSessionValid( $vCurrentTime, $vCookieSessionTimeEnd ) ) {
                 $vSessionID = $vExistingCookie["session_id"];
-                Logger::sLog( "Coimf_Cookie", 2, "Keeping old session ID: ", $vSessionID );
+                Logger::sLog( "Coimf_Cookie", LogLevel::INFO, "Keeping old session ID: ", $vSessionID );
             } else {
                 $vSessionID = self::generateGUID();
-                Logger::sLog( "Coimf_Cookie", 2, "Generating new session ID: ", $vSessionID );
+                Logger::sLog( "Coimf_Cookie", LogLevel::INFO, "Generating new session ID: ", $vSessionID );
             }
 
             $vCookie = [
@@ -134,11 +134,11 @@ class Cookie {
     private static function isSessionValid( \DateTime $aCurrentTime, \DateTime $aSessionEndTime ) : bool {
         $vValid = $aCurrentTime < $aSessionEndTime;
         if ( $aCurrentTime < $aSessionEndTime ) {
-            Logger::sLog( "Coimf_Cookie", 2, "Session Valid: ");
-            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
+            Logger::sLog( "Coimf_Cookie", LogLevel::INFO, "Session Valid: ");
+            Logger::sLog( "Coimf_Cookie", LogLevel::INFO, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
         } else {
-            Logger::sLog( "Coimf_Cookie", 2, "Session not valid");
-            Logger::sLog( "Coimf_Cookie", 2, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
+            Logger::sLog( "Coimf_Cookie", LogLevel::INFO, "Session not valid");
+            Logger::sLog( "Coimf_Cookie", LogLevel::INFO, "Current Time ", $aCurrentTime->format( self::cTimestampFormat ), "Time End", $aSessionEndTime->format( self::cTimestampFormat ) );
         }
         return $vValid;
     }

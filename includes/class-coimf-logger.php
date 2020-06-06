@@ -7,7 +7,7 @@ class LogLevel extends Enum {
     public const DEBUG  = 1;
     public const INFO   = 2;
     public const WARN   = 3;
-    public const ERROR   = 3;
+    public const ERROR   = 4;
 }
 
 class Logger {
@@ -21,7 +21,7 @@ class Logger {
         $this->mLogGroup = $aLogGroup;
     }
 
-    public static function sLog( string $aLogGroup, int $aLogLevel = 2  ) {
+    public static function sLog( string $aLogGroup, int $aLogLevel = LogLevel::INFO  ) {
         $vLogger = new self( $aLogGroup );
         $vMessages = func_get_args();
         // removing the first two arguments
@@ -31,7 +31,13 @@ class Logger {
         $vLogger->log( $aLogLevel, ...$vMessages );
     }
 
-    public function log( $aLogLevel = 2 ) {
+    public function log( $aLogLevel = LogLevel::INFO ) {
+
+        // not logging below log level
+        if ( COIMF_DEBUG > $aLogLevel ) {
+            return;
+        }
+
         $vLogDirectory = wp_upload_dir()["basedir"] . "/" . COIMF_NAME . "/" . $this->mLogGroup;
 
         if ( ! file_exists( $vLogDirectory ) ) {

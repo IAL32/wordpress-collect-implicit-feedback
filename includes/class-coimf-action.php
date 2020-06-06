@@ -88,7 +88,7 @@ class Action {
             new \DateTime( "now" )
         );
 
-        $this->mLogger->log( 2, "::addClickPositionCallback()", var_export( $vQueryResult, true ) );
+        $this->mLogger->log( LogLevel::DEBUG, "::addClickPositionCallback()", var_export( $vQueryResult, true ) );
 
         return new \WP_REST_Response( [ "message" => "Click logged" ], 200 );
     }
@@ -249,7 +249,7 @@ class Action {
         $vQuery .= \Coimf\DB::whereQueryFromArgs( $vFilter );
 
         if ( COIMF_DRY_UPDATE ) {
-            Logger::sLog( "Coimf_Action", 2, "::addAction()", $vQuery );
+            Logger::sLog( "Coimf_Action", LogLevel::INFO, "::addAction()", $vQuery );
             return true;
         }
 
@@ -272,7 +272,7 @@ class Action {
             $aUserGUID, $aSession, $aActionType, $aValue, $vTimeStartFormat, $vTimeEndFormat );
 
         if ( COIMF_DRY_UPDATE ) {
-            $this->mLogger->log( 2, "::addAction()", $vQuery );
+            $this->mLogger->log( LogLevel::INFO, "::addAction()", $vQuery );
             return true;
         }
 
