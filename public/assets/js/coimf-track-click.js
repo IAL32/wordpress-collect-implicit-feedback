@@ -17,18 +17,23 @@
             vHTML.clientHeight, vHTML.scrollHeight, vHTML.offsetHeight);
     }
 
-    $(document).click(function (aMouseClickEvent) {
+    $(document).on("click", function (aMouseClickEvent) {
 
         if (vClicked) {
             return;
         }
 
-        vClicked = true;
-
         let vPageX = aMouseClickEvent.pageX;
         let vPageY = aMouseClickEvent.pageY;
         let vPageWidth = window.screen.width;
         let vPageHeight = window.screen.height;
+
+        if (!vPageX || !vPageY) {
+            // cannot log empty click position
+            return;
+        }
+
+        vClicked = true;
 
         $.post(gCoimf.mSiteURL + "/wp-json/coimf/v1/track-click/", {
             "mouseX": vPageX,
