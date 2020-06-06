@@ -4,42 +4,18 @@ namespace Coimf {
 
 class Public_Handler {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $mPluginName    The ID of this plugin.
-	 */
-	private $mPluginName;
-
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $mVersion    The current version of this plugin.
-	 */
-	private $mVersion;
-
-	private $mCookie;
-
 	private \Coimf\Logger $mLogger;
+
+	private \Coimf\Loader $mLoader;
 
 	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
-	 * @param      string    $aPluginName       The name of the plugin.
-	 * @param      string    $aVersion    The version of this plugin.
 	 */
-	public function __construct( $aPluginName, $aVersion ) {
-
-		$this->mPluginName = $aPluginName;
-		$this->mVersion = $aVersion;
-		$this->mCookie = \Coimf\Cookie::getCookie();
+	public function __construct() {
 		$this->mLogger = new \Coimf\Logger( "Coimf_Public" );
-
+		$this->mLoader = new \Coimf\Loader();
 	}
 
 	public function handleSessionStart() {
@@ -72,33 +48,24 @@ class Public_Handler {
 			return;
 		}
 
-		$vCoimf = [
-			"mPluginName" => $this->mPluginName,
-			"mVersion" => $this->mVersion,
-			"mIsUserAdmin" => is_admin() ? "true" : "false",
-			"mSettings" => [
-				"mPageTrackSelector" => get_option( "coimf_track_page_selector" )
-			]
-		];
-
 		wp_enqueue_script(
 			"coimf-public",
 			plugin_dir_url( __FILE__ ) . "assets/js/coimf-public.js",
 			[ "jquery" ],
-			$this->mVersion,
+			COIMF_VERSION,
 			false
 		);
-		wp_localize_script( "coimf-public", "gCoimf", $vCoimf);
+		wp_localize_script( "coimf-public", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 
 		// TODO: make this customizable
 		wp_enqueue_script(
 			"coimf-track-click",
 			plugin_dir_url( __FILE__ ) . "assets/js/coimf-track-click.js",
 			[ "jquery" ],
-			$this->mVersion,
+			COIMF_VERSION,
 			false
 		);
-		wp_localize_script( "coimf-track-click", "gCoimf", $vCoimf);
+		wp_localize_script( "coimf-track-click", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 
 		// only tracking page time on articles
 		if ( is_single() ) {
@@ -106,10 +73,10 @@ class Public_Handler {
 				"coimf-track-page-time",
 				plugin_dir_url( __FILE__ ) . "assets/js/coimf-track-page-time.js",
 				[ "jquery" ],
-				$this->mVersion,
+				COIMF_VERSION,
 				false
 			);
-			wp_localize_script( "coimf-track-page-time", "gCoimf", $vCoimf);
+			wp_localize_script( "coimf-track-page-time", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 		}
 
 	}
@@ -159,8 +126,10 @@ class Public_Handler {
 
 		// FIXME: Action should not be instantiated every time. Find a better way
 		// to access this
-		$vAction = new \Coimf\Action( $this->mPluginName );
-		$vAction->addInternalLinkAction( $this->mCookie->getGUID(), $this->mCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new \DateTime( "now" ) );
+		// Maybe with $mLoader?
+		$vAction = new \Coimf\Action();
+		$vCookie = \Coimf\Cookie::getCookie();
+		$vAction->addInternalLinkAction( $vCookie->getGUID(), $vCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new \DateTime( "now" ) );
 	}
 
 	private function isURLExternal( string $aURL ) : bool {

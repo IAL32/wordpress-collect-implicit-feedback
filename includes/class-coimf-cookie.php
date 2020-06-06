@@ -83,7 +83,8 @@ class Cookie {
             setcookie(
                 self::cCookieName . "[" . $vKey . "]",
                 $vValue,
-                $vNewCookieExpireTime->getTimestamp()
+                $vNewCookieExpireTime->getTimestamp(),
+                "/" // entire domain
             );
         }
 

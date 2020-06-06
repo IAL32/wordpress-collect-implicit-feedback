@@ -84,6 +84,13 @@ class TimeFunctions {
         self::addTimeToDateTime( TimeType::Months, $aDateTime, $aMonths );
     }
 
+    public static function dateTimeToMYSQLDateTime() {
+
+    }
+
+    public const cMYSQLDateTimeFormat = "Y-m-d H:i:s";
+    public const cJsMYSQLDateTimeFormat = "YYYY-MM-DD HH:mm:ss";
+
 }
 
 }

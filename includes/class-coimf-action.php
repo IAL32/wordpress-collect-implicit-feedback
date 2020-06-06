@@ -11,14 +11,13 @@ abstract class Action_Type extends Enum {
 
 class Action {
 
-    public function __construct( string $aPluginName ) {
-        $this->mPluginName = $aPluginName;
+    public function __construct() {
         $this->mLogger = new \Coimf\Logger( "Coimf_Action" );
     }
 
-    public function registerEndpoint() : void {
+    public function registerEndpoints() : void {
         register_rest_route(
-            $this->mPluginName . "/" . self::cAPIVersion,
+            COIMF_NAME . "/" . self::cAPIVersion,
             "/track-click/",
             [
                 "methods" => \WP_REST_Server::CREATABLE,
@@ -26,7 +25,7 @@ class Action {
             ]
         );
         register_rest_route(
-            $this->mPluginName . "/" . self::cAPIVersion,
+            COIMF_NAME . "/" . self::cAPIVersion,
             "/track-page-time/",
             [
                 "methods" => \WP_REST_Server::CREATABLE,
@@ -34,13 +33,27 @@ class Action {
             ]
         );
         register_rest_route(
-            $this->mPluginName . "/" . self::cAPIVersion,
+            COIMF_NAME . "/" . self::cAPIVersion,
             "/delete/",
             [
                 "methods" => \WP_REST_Server::DELETABLE,
                 "callback" => [ $this, "deleteActionCallback" ],
                 "permission_callback" => function( \WP_REST_Request $aRequest ) {
-                    // FIXME: use nonces
+                    // FIXME: use dedicated function
+                    // FIXME: customizable roles
+                    return current_user_can( "administrator" );
+                }
+            ]
+        );
+        // FIXME: this has to be in an admin class
+        // FIXME: better name for read action
+        register_rest_route(
+            COIMF_NAME . "/" . self::cAPIVersion . "/admin",
+            "/get-actions/",
+            [
+                "methods" => \WP_REST_Server::READABLE,
+                "callback" => [ $this, "getActionsCallback" ],
+                "permission_callback" => function( \WP_REST_Request $aRequest ) {
                     // FIXME: use dedicated function
                     // FIXME: customizable roles
                     return current_user_can( "administrator" );
@@ -105,7 +118,7 @@ class Action {
 
     public function deleteActionCallback( \WP_REST_Request $aRequest ) {
         // sanity check
-        if ( ! is_admin() && ( ! current_user_can( "administrator" ) || ! current_user_can( "editor" ) ) ) {
+        if ( ! current_user_can( "administrator" ) || ! current_user_can( "editor" ) ) {
             return new \WP_REST_Response( [ "message" => "User not allowed" ], 403 );
         }
 
@@ -114,6 +127,23 @@ class Action {
         self::deleteAction( $vActionID );
 
         return new \WP_REST_Response( [ "message" => "Item deleted" ], 200 );
+    }
+
+    public function getActionsCallback( \WP_REST_Request $aRequest ) {
+        $vSelect = $aRequest->get_param( "select" );
+        $vFilter = $aRequest->get_param( "filter" );
+        $vGroupBy = $aRequest->get_param( "groupby" );
+
+        $vActions = self::getActions([
+            "vSelect" => $vSelect,
+            "vFilter" => $vFilter,
+            "vGroupBy" => $vGroupBy,
+        ]);
+
+        return new \WP_REST_Response([
+            "message"   => "Actions Retrieved",
+            "data"      => $vActions,
+        ], 200 );
     }
 
     public static function getAction( $aActionID ) {
@@ -137,20 +167,24 @@ class Action {
         $vDefaults = [
             "vLimit"        => 20,
             "vOffset"       => -1,
-            "vTimeStart"    => 0,
-            "vTimeEnd"      => 0,
             "vOrderBy"      => "time_end",
             "vOrder"        => "DESC",
             "vSelect"       => ["*"],
             "vFilter"       => [
-                // FIXME: value needs to be a value, so we can set multiple
+                // FIXME: value needs to be an array, so we can set multiple
                 // filters for each column
                 // "action_type"   => false,
             ],
+            "vGroupBy"      => [],
         ];
 
         $vArgs = array_merge( $vDefaults, $aArgs );
         extract( $vArgs );
+
+        // select cannot be empty
+        if ( empty( $vSelect ) ) {
+            $vSelect = "*";
+        }
 
         if ( is_array( $vSelect ) ) {
             $vSelect = implode( ",", $vSelect );
@@ -159,35 +193,16 @@ class Action {
         $vDB = \Coimf\DB::getInstance();
         $vTableName = $vDB->getDataTableName();
 
-        if ( !$vTimeStart && !$vTimeEnd ) {
-            $vQuery = "SELECT {$vSelect} from {$vTableName}";
-        } else if ( !$vTimeStart && $vTimeEnd > 0 ) {
-            $vTimeEndDateTime = $vDB->timestampToMYSQLDateTime( $vTimeEnd );
+        $vQuery = "SELECT {$vSelect} from {$vTableName}";
 
-            $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from {$vTableName}
-                WHERE time_end <= %s
-            ", $vTimeEndDateTime );
-        } else if ( $vTimeStart > 0 && !$vTimeEnd ) {
-            $vTimeStartDateTime = $vDB->timestampToMYSQLDateTime( $vTimeStart );
+        $vQuery .= \Coimf\DB::whereQueryFromArgs( $vFilter );
 
-            $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from {$vTableName}
-                WHERE id = %s AND
-                time_start >= %s
-            ", $vTimeStartDateTime );
-        } else {
-            $vTimeStartDateTime = $vDB->timestampToMYSQLDateTime( $vTimeStart );
-            $vTimeEndDateTime = $vDB->timestampToMYSQLDateTime( $vTimeEnd );
-
-            $vQuery = $vDB->prepare( "
-                SELECT {$vSelect} from {$vTableName}
-                WHERE time_start >= %s AND
-                time_end <= %s
-            ", $vTimeStartDateTime, $vTimeEndDateTime );
+        if ( ! empty( $vGroupBy ) ) {
+            if ( is_array( $vGroupBy ) ) {
+                $vGroupBy = implode( ", ", $vGroupBy );
+            }
+            $vQuery .= " GROUP BY " . $vGroupBy;
         }
-
-        $vQuery .= \Coimf\DB::whereFromArgs( $vFilter );
 
         $vQuery .= " ORDER BY ${vOrderBy} {$vOrder}";
 
@@ -231,7 +246,7 @@ class Action {
 
         $vQuery = "DELETE FROM {$vTableName}";
 
-        $vQuery .= \Coimf\DB::whereFromArgs( $vFilter );
+        $vQuery .= \Coimf\DB::whereQueryFromArgs( $vFilter );
 
         if ( COIMF_DRY_UPDATE ) {
             Logger::sLog( "Coimf_Action", 2, "::addAction()", $vQuery );
@@ -247,8 +262,8 @@ class Action {
 
         $vTableName = $vDB->getDataTableName();
 
-        $vTimeStartFormat = $aTimeStart->format( self::cActionTimestampFormat );
-        $vTimeEndFormat = $aTimeEnd->format( self::cActionTimestampFormat );
+        $vTimeStartFormat = $aTimeStart->format( \Coimf\TimeFunctions::cMYSQLDateTimeFormat );
+        $vTimeEndFormat = $aTimeEnd->format( \Coimf\TimeFunctions::cMYSQLDateTimeFormat );
 
         $vQuery = $vDB->prepare( "
             INSERT INTO {$vTableName}
@@ -298,15 +313,19 @@ class Action {
             "location" => $aPageURL,
         ]);
 
-        return $this->addAction( \Coimf\Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $aTime, $aTime );
+        // adding the page time
+        $vEndTime = clone $aTime;
+        $vEndTime->modify( "+" . $aPageTime . " seconds" );
+
+        return $this->addAction( \Coimf\Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $aTime, $vEndTime );
     }
 
     public static function fromAction( \stdClass $aActionObject ) {
         $vNewObject = clone $aActionObject;
         $vNewObject->value = json_decode( $aActionObject->value );
 
-        $vNewObject->time_start = \DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_start );
-        $vNewObject->time_end = \DateTime::createFromFormat( self::cActionTimestampFormat, $aActionObject->time_end );
+        $vNewObject->time_start = \DateTime::createFromFormat( \Coimf\TimeFunctions::cMYSQLDateTimeFormat, $aActionObject->time_start );
+        $vNewObject->time_end = \DateTime::createFromFormat( \Coimf\TimeFunctions::cMYSQLDateTimeFormat, $aActionObject->time_end );
         // switch( intval( $aActionObject->action_type ) ) {
         //     case \Coimf\Action_Type::Click: {
         //     }
@@ -317,13 +336,11 @@ class Action {
     private function isLinkLocal( string $aLink ) {
         $vComponents = parse_url( $aLink );
         // empty host will indicate url like '/relative.php'
-        return !empty( $vComponents['host'] ) || strcasecmp( $vComponents['host'], $_SERVER["SERVER_NAME"] );
+        return !empty( $vComponents["host"] ) || strcasecmp( $vComponents["host"], $_SERVER["SERVER_NAME"] );
     }
 
-    private string $mPluginName;
     private \Coimf\Logger $mLogger;
     private const cAPIVersion = "v1";
-    private const cActionTimestampFormat = "Y-m-d H:i:s";
 
 }
 

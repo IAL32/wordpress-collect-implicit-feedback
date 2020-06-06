@@ -20,10 +20,6 @@ class DB {
         return new self();
     }
 
-    public function timestampToMYSQLDateTime( $aTime ) {
-        return date( "Y-m-d H:i:s", $aTime );
-    }
-
     public function getDataTableName() {
         return $this->mWPDB->prefix . self::$cTablePrefix . self::$cDataTableName;
     }
@@ -48,7 +44,7 @@ class DB {
         return $this->mWPDB->get_row( ...func_get_args() );
     }
 
-    public static function whereFromArgs( array $vFilter = [] ) {
+    public static function whereQueryFromArgs( array $vFilter = [] ) {
         if ( ! empty( $vFilter ) ) {
             // Necessary 1=1 in order to have simpler AND concatenation of rules
             $vWhereQuery = " WHERE 1=1";

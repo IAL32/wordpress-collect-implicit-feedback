@@ -59,6 +59,7 @@ class Coimf {
 		$this->mCoimf = "coimf";
 
 		$this->loadDependencies();
+		$this->defineGlobalHooks();
 		$this->defineAdminHooks();
 		$this->definePublicHooks();
 
@@ -121,7 +122,7 @@ class Coimf {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . "public/class-coimf-public.php";
 
 		$this->mLoader = new \Coimf\Loader();
-		$this->mAction = new \Coimf\Action( $this->mCoimf );
+		$this->mAction = new \Coimf\Action();
 		$this->mDB = \Coimf\DB::getInstance();
 
 	}
@@ -135,7 +136,7 @@ class Coimf {
 	 */
 	private function defineAdminHooks() {
 
-		$vPluginAdmin = new \Coimf\Admin_Handler( $this->getCoimf(), $this->getVersion() );
+		$vPluginAdmin = new \Coimf\Admin_Handler();
 
 		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueStyles" );
 		$this->mLoader->addAction( "admin_enqueue_scripts", $vPluginAdmin, "enqueueScripts" );
@@ -153,13 +154,20 @@ class Coimf {
 	 */
 	private function definePublicHooks() {
 
-		$vPluginPublic = new \Coimf\Public_Handler( $this->getCoimf(), $this->getVersion() );
+		$vPluginPublic = new \Coimf\Public_Handler();
 
 		$this->mLoader->addAction( "init", $vPluginPublic, "handleSessionStart" );
-		$this->mLoader->addAction( "rest_api_init", $this->mAction, "registerEndpoint" );
-		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueStyles" );
 		$this->mLoader->addAction( "wp_enqueue_scripts", $vPluginPublic, "enqueueScripts" );
 
+	}
+
+	private function defineGlobalHooks() {
+		$this->mLoader->addAction( "rest_api_init", $this->mAction, "registerEndpoints" );
+		$this->mLoader->addAction( "admin_enqueue_scripts", $this, "enqueueScripts" );
+	}
+
+	public function enqueueScripts() {
+		wp_enqueue_script( "coimf-custom-prototypes", COIMF_ROOT_URL . "assets/js/coimf-custom-prototypes.js", [ "jquery" ], COIMF_VERSION, false  );
 	}
 
 	/**
@@ -172,17 +180,6 @@ class Coimf {
 	}
 
 	/**
-	 * The name of the plugin used to uniquely identify it within the context of
-	 * WordPress and to define internationalization functionality.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The name of the plugin.
-	 */
-	public function getCoimf() {
-		return $this->mCoimf;
-	}
-
-	/**
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
@@ -190,16 +187,6 @@ class Coimf {
 	 */
 	public function getLoader() {
 		return $this->mLoader;
-	}
-
-	/**
-	 * Retrieve the version number of the plugin.
-	 *
-	 * @since     1.0.0
-	 * @return    string    The version number of the plugin.
-	 */
-	public function getVersion() {
-		return $this->mVersion;
 	}
 
 }
