@@ -61,19 +61,32 @@ class Action_Table extends External\WP_List_Table {
 
     function prepare_items() {
 
-        // $vActionSearchKey = isset( $_REQUEST['s'] ) ? wp_unslash( trim( $_REQUEST['s'] ) ) : '';
+        // FIXME: action type has to be filtered by its name, not by its value
+        $vActionTypeSearchKey = isset( $_REQUEST["s"] ) ? wp_unslash( trim( $_REQUEST["s"] ) ) : "";
 
         $vUsersPerPage = $this->get_items_per_page( "actions_per_page" );
         $vTablePage = $this->get_pagenum();
 
+        if ( $vActionTypeSearchKey !== "" ) {
+            $vFilter = [
+                "action_type"   => " = $vActionTypeSearchKey",
+            ];
+        } else {
+            $vFilter = [];
+        }
+
         $vActions = \Coimf\Action::getActions([
             "vLimit" => $vUsersPerPage,
             "vOffset" => ( $vTablePage - 1 ) * $vUsersPerPage,
-            "vOrderBy"   => ( isset( $_GET['orderby'] ) ) ? esc_sql( $_GET['orderby'] ) : 'time_end',
-            "vOrder"   => ( isset( $_GET['order'] ) ) ? esc_sql( $_GET['order'] ) : 'DESC',
+            "vOrderBy"   => ( isset( $_GET["orderby"] ) ) ? esc_sql( $_GET["orderby"] ) : "time_end",
+            "vOrder"   => ( isset( $_GET["order"] ) ) ? esc_sql( $_GET["order"] ) : "DESC",
+            "vFilter"   => $vFilter,
         ]);
 
-        $vTotalUsers = intval( \Coimf\Action::getAllActions(["vSelect" => "COUNT(*)"]));
+        $vTotalUsers = intval( \Coimf\Action::getAllActions([
+            "vSelect"   => "COUNT(*)",
+            "vFilter"   => $vFilter,
+        ]));
 
         $this->set_pagination_args([
             "total_items"   => $vTotalUsers,

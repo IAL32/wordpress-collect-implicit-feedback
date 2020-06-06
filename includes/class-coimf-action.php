@@ -115,6 +115,11 @@ class Action {
             "vOrderBy"      => "time_end",
             "vOrder"        => "DESC",
             "vSelect"       => ["*"],
+            "vFilter"       => [
+                // FIXME: value needs to be a value, so we can set multiple
+                // filters for each column
+                // "action_type"   => false,
+            ],
         ];
 
         $vArgs = array_merge( $vDefaults, $aArgs );
@@ -153,6 +158,24 @@ class Action {
                 WHERE time_start >= %s AND
                 time_end <= %s
             ", $vTimeStartDateTime, $vTimeEndDateTime );
+        }
+
+        if ( ! empty( $vFilter ) ) {
+            // Necessary 1=1 in order to have simpler AND concatenation of rules
+            $vWhereQuery = " WHERE 1=1";
+            $vWhereQueryPresent = false;
+            foreach ( $vFilter as $vFilterColumn => $vColumnValue ) {
+                if ( $vColumnValue === false ) {
+                    continue;
+                }
+
+                $vWhereQuery .= " AND {$vFilterColumn} {$vColumnValue}";
+                $vWhereQueryPresent = true;
+            }
+
+            if ( $vWhereQueryPresent ) {
+                $vQuery .= $vWhereQuery;
+            }
         }
 
         $vQuery .= " ORDER BY ${vOrderBy} {$vOrder}";
