@@ -318,10 +318,10 @@ class Action {
         ]);
 
         // adding the page time
-        $vEndTime = clone $aTime;
-        $vEndTime->modify( "+" . $aPageTime . " seconds" );
+        $vStartTime = clone $aTime;
+        $vStartTime->modify( "-" . $aPageTime . " seconds" );
 
-        return $this->addAction( \Coimf\Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $aTime, $vEndTime );
+        return $this->addAction( \Coimf\Action_Type::PageRead, $aUserGUID, $aSession, $vValue, $vStartTime, $aTime );
     }
 
     public static function fromAction( \stdClass $aActionObject ) {
