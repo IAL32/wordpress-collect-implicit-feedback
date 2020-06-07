@@ -20,7 +20,10 @@
                 "translate(" + vMargin.mLeft + "," + vMargin.mTop + ")");
 
         // Labels of rows
-        let vWeekDays = moment.weekdays();
+        let vWeekDays = []
+        for (let vIdx = 1; vIdx <= 7; vIdx++) {
+            vWeekDays.push(moment().subtract(7 - vIdx, "days").format("DD/MM"));
+        }
 
         // Build X scales and axis:
         let vXAxis = d3.scaleBand()
@@ -40,7 +43,7 @@
             data: {
                 // FIXME: possible SQL injection
                 "select": [
-                    "CAST(time_start AS DATE) as time_start_date",
+                    "CAST(time_end AS DATE) as time_end_date",
                     "SUM(JSON_EXTRACT(value, \"$.pageTime\")) as page_time_sum",
                 ],
                 "filter": {
@@ -49,7 +52,7 @@
                     "time_end": "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
                 },
                 "groupby": [
-                    "CAST(time_start AS DATE)"
+                    "CAST(time_end AS DATE)"
                 ],
                 "limit": -1,
                 "offset": -1,
@@ -77,8 +80,7 @@
                 .enter()
                 .append("rect")
                 .attr("x", function (aItem) {
-                    let vItemTimeStart = moment(aItem.time_start_date).format("dddd");
-                    return vXAxis(vItemTimeStart);
+                    return vXAxis(moment(aItem.time_end_date).format("DD/MM"));
                 })
                 .attr("y", function (aItem) {
                     return vYAxis(aItem.page_time_sum);

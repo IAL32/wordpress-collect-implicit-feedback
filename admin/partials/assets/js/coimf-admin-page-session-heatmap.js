@@ -90,6 +90,7 @@
                 .attr("transform", "translate(" + (vWidth + 20) + ", " + vMargin.mTop + ")");
 
             var legendLinear = d3.legendColor()
+                .labelFormat(d3.format(".2s"))
                 .shapeWidth(30)
                 .title("Seconds")
                 .orient("vertical")
