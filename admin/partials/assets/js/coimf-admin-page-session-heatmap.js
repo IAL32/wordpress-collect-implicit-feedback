@@ -92,7 +92,7 @@
             var legendLinear = d3.legendColor()
                 .labelFormat(d3.format(".2s"))
                 .shapeWidth(30)
-                .title("Seconds")
+                .title("Number of sessions")
                 .orient("vertical")
                 .scale(vColor);
 

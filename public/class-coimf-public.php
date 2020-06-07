@@ -106,7 +106,7 @@ class Public_Handler {
 		global $wp;
 		$vHTTPReferer = wp_get_referer();
 		if ( !$vHTTPReferer ) {
-			return;
+			$vHTTPReferer = ""; // empty referer, external
 		}
 
 		$vCurrentSlug = $_SERVER["REQUEST_URI"];
@@ -152,6 +152,13 @@ class Public_Handler {
 	private function isRequestAjax() : bool {
 		return !empty( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && 
 				strtolower( $_SERVER['HTTP_X_REQUESTED_WITH'] ) == 'xmlhttprequest';
+	}
+
+	private function isBot() : bool {
+		return (
+			isset( $_SERVER["HTTP_USER_AGENT"] )
+			&& preg_match( "/bot|crawl|slurp|spider|mediapartners/i", $_SERVER["HTTP_USER_AGENT"] )
+		);
 	}
 
 	private function isPageBeingTracked( string $aURL ) : bool {

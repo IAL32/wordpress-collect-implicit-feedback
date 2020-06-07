@@ -163,10 +163,10 @@ class Coimf {
 
 	private function defineGlobalHooks() {
 		$this->mLoader->addAction( "rest_api_init", $this->mAction, "registerEndpoints" );
-		$this->mLoader->addAction( "admin_enqueue_scripts", $this, "enqueueScripts" );
+		$this->mLoader->addAction( "admin_enqueue_scripts", $this, "enqueueAdminScripts" );
 	}
 
-	public function enqueueScripts() {
+	public function enqueueAdminScripts() {
 		wp_enqueue_script( "coimf-custom-prototypes", COIMF_ROOT_URL . "assets/js/coimf-custom-prototypes.js", [ "jquery" ], COIMF_VERSION, false  );
 	}
 
