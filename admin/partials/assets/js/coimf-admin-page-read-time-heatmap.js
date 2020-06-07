@@ -55,7 +55,7 @@
             data: {
                 // FIXME: possible SQL injection
                 "select": [
-                    "time_start",
+                    "time_end",
                     "SUM(JSON_EXTRACT(value, \"$.pageTime\")) as page_time_sum",
                 ],
                 "filter": {
@@ -64,8 +64,8 @@
                     "time_end": "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
                 },
                 "groupby": [
-                    "hour( time_start )",
-                    "day( time_start )",
+                    "hour( time_end )",
+                    "day( time_end )",
                 ],
                 "limit": -1,
                 "offset": -1,
@@ -106,10 +106,10 @@
                 .enter()
                 .append("rect")
                 .attr("x", function (aItem) {
-                    return vXAxis(moment(aItem.time_start).format("DD/MM"));
+                    return vXAxis(moment(aItem.time_end).format("DD/MM"));
                 })
                 .attr("y", function (aItem) {
-                    return vYAxis(moment(aItem.time_end).format("HH"));
+                    return vYAxis(moment(aItem.time_end).format("HH") + ":00");
                 })
                 .attr("width", vXAxis.bandwidth())
                 .attr("height", vYAxis.bandwidth())
