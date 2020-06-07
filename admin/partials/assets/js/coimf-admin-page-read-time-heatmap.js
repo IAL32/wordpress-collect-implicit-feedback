@@ -20,7 +20,7 @@
 
         // Labels of row and columns
         let vWeekDays = []
-        for (let vIdx = 0; vIdx < 7; vIdx++) {
+        for (let vIdx = 1; vIdx <= 7; vIdx++) {
             vWeekDays.push(moment().subtract(7 - vIdx, "days").format("DD/MM"));
         }
 
