@@ -103,21 +103,10 @@ class Public_Handler {
 			return;
 		}
 
-		global $wp;
-		$vHTTPReferer = wp_get_referer();
-		if ( !$vHTTPReferer ) {
-			$vHTTPReferer = ""; // empty referer, external
-		}
-
+		$vHTTPReferer = $this->getHTTPReferrer();
 		$vCurrentSlug = $_SERVER["REQUEST_URI"];
 
-		if ( ! $this->isURLExternal( $vHTTPReferer ) ) {
-			// trimming referrer to just get the path
-			$vHTTPReferer = parse_url( $vHTTPReferer, PHP_URL_PATH );
-		}
-
 		$this->mLogger->log( LogLevel::INFO, $vHTTPReferer, ";", $vCurrentSlug );
-
 		$this->mLogger->log( LogLevel::INFO, "Is being tracked:", var_export( $this->isPageBeingTracked( $vCurrentSlug ), true ) );
 
 		if ( ! $this->isPageBeingTracked( $vCurrentSlug ) ) {
@@ -125,8 +114,7 @@ class Public_Handler {
 		}
 
 		// not logging self-referring navigation
-		// TODO: is this ok though?
-		if ( $vHTTPReferer == $vCurrentSlug ) {
+		if ( strcasecmp( $vHTTPReferer, $vCurrentSlug ) == 0 ) {
 			return;
 		}
 
@@ -138,15 +126,44 @@ class Public_Handler {
 		$vAction->addInternalLinkAction( $vCookie->getGUID(), $vCookie->getSession(), $vHTTPReferer, $vCurrentSlug, new \DateTime( "now" ) );
 	}
 
+	/**
+	 * @return string HTTP Referrer, domain if external, or path if internal
+	 */
+	private function getHTTPReferrer() : string {
+		$vHTTPReferer = $_SERVER["HTTP_REFERER"];
+
+		if ( $vHTTPReferer ) {
+			$vParsedURL = parse_url( $vHTTPReferer );
+
+			if ( $this->isURLExternal( $vHTTPReferer ) ) {
+				// the url is external, so we only log the domain
+				$vHTTPReferer = $vParsedURL["host"];
+			} else {
+				// the url is local, so we will only get the path
+				$vHTTPReferer = $vParsedURL["path"];
+
+				// no path, but still local, so we just assume a slash (root dir)
+				if ( ! $vHTTPReferer ) {
+					$vHTTPReferer = "/";
+				}
+			}
+		} else {
+			// no referer detected, might as well say that its empty
+			$vHTTPReferer = "";
+		}
+
+		return $vHTTPReferer;
+	}
+
 	private function isURLExternal( string $aURL ) : bool {
-		$vURLComponents = parse_url( $aURL );    
+		$vURLComponents = parse_url( $aURL );
 		// empty host will indicate url like '/relative.php'
-		return !empty( $vURLComponents['host'] )
-				&& strcasecmp( $vURLComponents['host'], $_SERVER["SERVER_NAME"] );
+		return ! empty( $vURLComponents["host"] )
+				&& strcasecmp( $vURLComponents["host"], $_SERVER["SERVER_NAME"] ) != 0;
 	}
 
 	private function isPageRefresh() : bool {
-		return isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] == 'max-age=0';
+		return isset($_SERVER["HTTP_CACHE_CONTROL"]) && $_SERVER["HTTP_CACHE_CONTROL"] == "max-age=0";
 	}
 
 	private function isRequestAjax() : bool {
