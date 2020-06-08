@@ -15,10 +15,14 @@ class Options {
         return explode( self::cTrackedPagesGlue, $vTrackedPagesOption );
     }
     
+    // FIXME: this has to be an array of options changeable by the user
     public static function getForbiddenToTrackPages() : array {
         return [
             "wp-cron.php",
+            "wp-json",
             "wp-admin",
+            "/feed",
+            "gbjson"
         ];
     }
 
