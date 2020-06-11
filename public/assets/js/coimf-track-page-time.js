@@ -19,7 +19,7 @@
                     return;
                 }
 
-                if (vPageTime > gCoimg.mMaxReadTimeSeconds) {
+                if (vPageTime > gCoimf.mMaxReadTimeSeconds) {
                     return;
                 }
 
