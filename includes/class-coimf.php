@@ -168,6 +168,7 @@ class Coimf {
 
 	public function enqueueAdminScripts() {
 		wp_enqueue_script( "coimf-custom-prototypes", COIMF_ROOT_URL . "assets/js/coimf-custom-prototypes.js", [ "jquery" ], COIMF_VERSION, false  );
+		wp_localize_script( "coimf-custom-prototypes", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 	}
 
 	/**

@@ -141,27 +141,25 @@ class Admin_Handler {
 
 	public function scrollTimeStatisticsPage() {
 		wp_enqueue_script( "scroll-time-heatmap", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-heatmap.js", [ "jquery", "coimf-custom-prototypes" ], COIMF_VERSION, false );
-		wp_localize_script( "scroll-time-heatmap", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 		wp_localize_script( "scroll-time-heatmap", "cHeatmapNonce", wp_create_nonce( "wp_rest" ) );
 
-		wp_enqueue_script( "scroll-time-barplot", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-barplot.js", [ "jquery" ], COIMF_VERSION, false );
-		wp_localize_script( "scroll-time-barplot", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
+		wp_enqueue_script( "scroll-time-barplot", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-barplot.js", [ "jquery", "coimf-custom-prototypes" ], COIMF_VERSION, false );
 		wp_localize_script( "scroll-time-barplot", "cBarplotNonce", wp_create_nonce( "wp_rest" ) );
 
-		wp_enqueue_script( "scroll-time-lineplot", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-lineplot.js", [ "jquery" ], COIMF_VERSION, false );
-		wp_localize_script( "scroll-time-lineplot", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
+		wp_enqueue_script( "scroll-time-lineplot", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-lineplot.js", [ "jquery", "coimf-custom-prototypes" ], COIMF_VERSION, false );
 		wp_localize_script( "scroll-time-lineplot", "cLineplotNonce", wp_create_nonce( "wp_rest" ) );
+
+		wp_enqueue_script( "scroll-time-histogram", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-histogram.js", [ "jquery", "coimf-custom-prototypes" ], COIMF_VERSION, false );
+		wp_localize_script( "scroll-time-histogram", "cHistogramNonce", wp_create_nonce( "wp_rest" ) );
 
 		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-page-read-time-statistics.php" );
 	}
 
 	public function sessionStatisticsPage() {
 		wp_enqueue_script( "session-heatmap", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-session-heatmap.js", [ "jquery", "coimf-custom-prototypes" ], COIMF_VERSION, false );
-		wp_localize_script( "session-heatmap", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 		wp_localize_script( "session-heatmap", "cHeatmapNonce", wp_create_nonce( "wp_rest" ) );
 
 		wp_enqueue_script( "session-histogram", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-session-histogram.js", [ "jquery", "coimf-custom-prototypes" ], COIMF_VERSION, false );
-		wp_localize_script( "session-histogram", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 		wp_localize_script( "session-histogram", "cHistogramNonce", wp_create_nonce( "wp_rest" ) );
 
 		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-page-session-statistics.php" );

@@ -15,6 +15,8 @@
             if (!vSent && $(this).scrollTop() >= vPostElement.position().top + vPostElement.prop("scrollHeight") - window.screen.height / 2) {
                 let vPageTime = Math.floor((new Date() - vStartTime) / 1000);
     
+                vSent = true;
+
                 if (vPageTime < gCoimf.mMinReadTimeSeconds ) {
                     return;
                 }
@@ -22,8 +24,6 @@
                 if (vPageTime > gCoimf.mMaxReadTimeSeconds) {
                     return;
                 }
-
-                vSent = true;
     
                 $.ajax({
                     type: "POST",

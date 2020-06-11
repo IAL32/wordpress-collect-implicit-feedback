@@ -1,6 +1,9 @@
 (function ($, window, document) {
 
     $(document).ready(function () {
+        // FIXME: add a lineplot here
+        return;
+
         // set the dimensions and margins of the graph
         var vMargin = { mTop: 30, mRight: 100, mBottom: 50, mLeft: 50 },
             vWidth = 450 - vMargin.mLeft - vMargin.mRight,
