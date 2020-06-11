@@ -4,7 +4,23 @@ namespace Coimf {
 
 class BaseFunctions {
 
-    
+    /**
+     * Parses an url into its protocol, domain and path
+     * FIXME: protocol has to be without double slash
+     * $vMatches[protocol] = URL protocol
+     * $vMatches[host] = URL domain
+     * $vMatches[path] = URL path
+     * 
+     * @param string URL to parse
+     * @return array array with matches
+     * @since 1.0.0
+     */
+    public static function parseURL( string $aURL ) : array {
+        preg_match(self::cURLRegex, $aURL, $vMatches);
+        return $vMatches;
+    }
+
+    public const cURLRegex = "/(?<protocol>(?:http(?:s|)?):\/\/)(?:(?<host>[^\/]*)(?<path>\/+.*))/";
 
 }
 

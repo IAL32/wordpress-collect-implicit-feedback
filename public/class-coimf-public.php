@@ -133,7 +133,7 @@ class Public_Handler {
 		$vHTTPReferer = $_SERVER["HTTP_REFERER"];
 
 		if ( $vHTTPReferer ) {
-			$vParsedURL = parse_url( $vHTTPReferer );
+			$vParsedURL = \Coimf\BaseFunctions::parseURL( $vHTTPReferer );
 
 			if ( $this->isURLExternal( $vHTTPReferer ) ) {
 				// the url is external, so we only log the domain
@@ -141,6 +141,7 @@ class Public_Handler {
 			} else {
 				// the url is local, so we will only get the path
 				$vHTTPReferer = $vParsedURL["path"];
+				// TODO: add option to remove unwanted url parameters
 
 				// no path, but still local, so we just assume a slash (root dir)
 				if ( ! $vHTTPReferer ) {
@@ -156,6 +157,7 @@ class Public_Handler {
 	}
 
 	private function isURLExternal( string $aURL ) : bool {
+		// TODO: replace with BaseFunctions::parseURL()
 		$vURLComponents = parse_url( $aURL );
 		// empty host will indicate url like '/relative.php'
 		return ! empty( $vURLComponents["host"] )
