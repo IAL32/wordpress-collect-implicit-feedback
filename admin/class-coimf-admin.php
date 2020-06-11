@@ -38,6 +38,7 @@ class Admin_Handler {
 		// wp_enqueue_style( $this->mPluginName, plugin_dir_url( __FILE__ ) . "css/coimf-admin.css", array(), $this->mVersion, "all" );
 		add_thickbox();
 		wp_enqueue_style( "thickbox", "/" . WPINC . "/js/thickbox/thickbox.css", null, "1.0" );
+		wp_enqueue_style( "jquery-ui-style", COIMF_ROOT_URL . "assets/js/" );
 	}
 
 	/**
@@ -59,6 +60,7 @@ class Admin_Handler {
 		 * class.
 		 */
 
+		wp_enqueue_script( "jquery-ui-datepicker", null, [ "jquery" ] );
 		wp_enqueue_script( "thickbox", null, [ "jquery" ] );
 		wp_enqueue_script( "d3js-v4", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/d3js.v4.min.js", [ "jquery" ], "4.0.0", false );
 		wp_enqueue_script( "d3-legend", plugin_dir_url( __FILE__ ) . "partials/assets/js/vendor/d3-legend.min.js", [ "jquery", "d3js-v4" ], "2.25.6", false );
@@ -71,9 +73,14 @@ class Admin_Handler {
 		register_setting( "coimf-settings-group", "coimf-track-page-selector" );
 		register_setting( "coimf-settings-group", "coimf-track-user-clicks" );
 		register_setting( "coimf-settings-group", "coimf-track-slug" );
+		register_setting( "coimf-settings-group", "coimf-track-min-read-time-seconds" );
+		register_setting( "coimf-settings-group", "coimf-track-max-read-time-seconds" );
+
 		add_option( "coimf-track-page-selector", ".post .entry-content" );
 		add_option( "coimf-track-user-clicks", "1" );
 		add_option( "coimf-track-slug", "/" );
+		add_option( "coimf-track-min-read-time-seconds", 2 );
+		add_option( "coimf-track-max-read-time-seconds", HOUR_IN_SECONDS );
 	}
 
 	public function addMenuPage() {
@@ -140,6 +147,10 @@ class Admin_Handler {
 		wp_enqueue_script( "scroll-time-barplot", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-barplot.js", [ "jquery" ], COIMF_VERSION, false );
 		wp_localize_script( "scroll-time-barplot", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
 		wp_localize_script( "scroll-time-barplot", "cNonce", wp_create_nonce( "wp_rest" ) );
+
+		wp_enqueue_script( "scroll-time-lineplot", plugin_dir_url( __FILE__ ) . "partials/assets/js/coimf-admin-page-read-time-lineplot.js", [ "jquery" ], COIMF_VERSION, false );
+		wp_localize_script( "scroll-time-lineplot", "gCoimf", \Coimf\Options::getGlobalCoimfOptions());
+		wp_localize_script( "scroll-time-lineplot", "cNonce", wp_create_nonce( "wp_rest" ) );
 
 		include_once( plugin_dir_path( __FILE__ ) . "partials/coimf-admin-page-read-time-statistics.php" );
 	}

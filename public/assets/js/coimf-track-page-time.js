@@ -12,15 +12,17 @@
                 throw "Coimf-Track-Page: Selector element does not match any element";
             }
 
-            // 
             if (!vSent && $(this).scrollTop() >= vPostElement.position().top + vPostElement.prop("scrollHeight") - window.screen.height / 2) {
                 let vPageTime = Math.floor((new Date() - vStartTime) / 1000);
     
-                // FIXME: make this a setting
-                if (vPageTime < 2 ) {
+                if (vPageTime < gCoimf.mMinReadTimeSeconds ) {
                     return;
                 }
-    
+
+                if (vPageTime > gCoimg.mMaxReadTimeSeconds) {
+                    return;
+                }
+
                 vSent = true;
     
                 $.ajax({

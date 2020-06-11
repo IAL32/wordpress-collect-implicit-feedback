@@ -13,6 +13,8 @@ class Activator {
 		add_option( "coimf-track-page-selector", ".post .entry-content" );
 		add_option( "coimf-track-user-clicks", "1" );
 		add_option( "coimf-track-slug", "/" );
+		add_option( "coimf-track-min-read-time-seconds", 2 );
+		add_option( "coimf-track-max-read-time-seconds", HOUR_IN_SECONDS );
 	}
 
 	private static function createDataTable() {
