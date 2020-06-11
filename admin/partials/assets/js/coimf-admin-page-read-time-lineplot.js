@@ -17,11 +17,6 @@
             .append("g")
             .attr("transform",
                 "translate(" + vMargin.mLeft + "," + vMargin.mTop + ")");
-        svg.append("text")
-            .attr("x", (vWidth / 2))             
-            .attr("y", 0 - (vMargin.mTop / 2))
-            .attr("text-anchor", "middle")
-            .text("Heatmap of page read time");
 
         // Labels of row and columns
         let vWeekDays = []
@@ -76,7 +71,7 @@
                 "offset": -1,
             },
             beforeSend: function (aXhr) {
-                aXhr.setRequestHeader("X-WP-Nonce", cHeatmapNonce);
+                aXhr.setRequestHeader("X-WP-Nonce", cLineplotNonce);
             },
         }).then(function (aResponse) {
             let vData = aResponse.data;

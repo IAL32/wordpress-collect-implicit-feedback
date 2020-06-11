@@ -2,8 +2,8 @@
 
     $(document).ready(function () {
         // set the dimensions and margins of the graph
-        var vMargin = { mTop: 30, mRight: 100, mBottom: 50, mLeft: 50 },
-            vWidth = 450 - vMargin.mLeft - vMargin.mRight,
+        var vMargin = { mTop: 30, mRight: 150, mBottom: 50, mLeft: 50 },
+            vWidth = 600 - vMargin.mLeft - vMargin.mRight,
             vHeight = 450 - vMargin.mTop - vMargin.mBottom;
 
         let vTimeStart = moment().subtract(7, "days");
@@ -70,7 +70,7 @@
                 "offset": -1,
             },
             beforeSend: function (aXhr) {
-                aXhr.setRequestHeader("X-WP-Nonce", cNonce);
+                aXhr.setRequestHeader("X-WP-Nonce", cHeatmapNonce);
             },
         }).then(function (aResponse) {
             let vData = aResponse.data;

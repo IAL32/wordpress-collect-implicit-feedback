@@ -18,6 +18,11 @@
             .append("g")
             .attr("transform",
                 "translate(" + vMargin.mLeft + "," + vMargin.mTop + ")");
+        svg.append("text")
+            .attr("x", (vWidth / 2))             
+            .attr("y", 0 - (vMargin.mTop / 2))
+            .attr("text-anchor", "middle")
+            .text("Total read time per day");
 
         // Labels of rows
         let vWeekDays = []
@@ -58,7 +63,7 @@
                 "offset": -1,
             },
             beforeSend: function (aXhr) {
-                aXhr.setRequestHeader("X-WP-Nonce", cNonce);
+                aXhr.setRequestHeader("X-WP-Nonce", cBarplotNonce);
             },
         }).then(function (aResponse) {
             let vData = aResponse.data;

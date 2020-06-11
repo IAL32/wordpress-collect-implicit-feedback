@@ -135,15 +135,28 @@ class Action {
         $vGroupBy = $aRequest->get_param( "groupby" );
         $vLimit = $aRequest->get_param( "limit" );
         $vOffset = $aRequest->get_param( "offset" );
+        $vOrderBy = $aRequest->get_param( "orderby" );
+        $vOrder = $aRequest->get_param( "order" );
 
-        $vActions = self::getActions([
+        $vArgs = [
             "vSelect"   => $vSelect,
             "vFilter"   => $vFilter,
             "vGroupBy"  => $vGroupBy,
             "vLimit"    => $vLimit,
             "vOffset"   => $vOffset,
-        ]);
+            "vOrderBy"  => $vOrderBy,
+            "vOrder"    => $vOrder,
+        ];
 
+        foreach ($vArgs as $vKey => $vValue) {
+            if ( empty( $vValue ) ) {
+                unset($vArgs[$vKey]);
+            }
+        }
+
+        $vActions = self::getActions($vArgs);
+
+        // FIXME: make custom WP_REST_Response
         return new \WP_REST_Response([
             "message"   => "Actions Retrieved",
             "data"      => $vActions,
