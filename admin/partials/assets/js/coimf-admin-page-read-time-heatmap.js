@@ -61,7 +61,7 @@
                 // FIXME: possible SQL injection
                 "select": [
                     "time_end",
-                    "SUM(JSON_EXTRACT(value, \"$.pageTime\")) as page_time_sum",
+                    "SUM(CAST(JSON_EXTRACT(value, \"$.pageTime\") AS int)) as page_time_sum",
                 ],
                 "filter": {
                     "action_type": "= " + 2,
