@@ -30,7 +30,7 @@
             data: {
                 // FIXME: possible SQL injection
                 "select": [
-                    "COUNT(*)",
+                    "COUNT(*) as pageCount",
                     "CAST(JSON_EXTRACT(value, \"$.pageTime\") AS int) as pageTime",
                 ],
                 "filter": {
@@ -38,6 +38,7 @@
                     "action_type": "= 2",
                     "time_start": ">= '" + vTimeStart.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
                     "time_end": "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
+                    "CAST(JSON_EXTRACT(value, \"$.pageTime\") AS int)": "<= " + gCoimf.mSettings.mMaxReadTimeSeconds, 
                 },
                 "groupby": [
                     "pageTime"
@@ -52,15 +53,15 @@
             },
         }).then(function (aResponse) {
             let vData = aResponse.data;
-            console.log(aResponse);
 
-            var vDataMax = d3.max(vData, function(aItem) {
-                return +aItem.pageTime;
+            let vDataMax = d3.max(vData, function(aItem) {
+                return +aItem.pageCount;
             });
 
-            let vXAxis = d3.scaleLinear()
-                .domain([0, vDataMax])
-                .range([0, vWidth]);
+            let vXAxis = d3.scaleBand()
+                .domain([...Array(vDataMax).keys()])
+                .range([0, vWidth])
+                .padding(0.01);
             svg.append("g")
                 .attr("transform", "translate(0," + vHeight + ")")
                 .call(d3.axisBottom(vXAxis))
@@ -74,19 +75,9 @@
                 .style("text-anchor", "middle")
                 .text("Read Time");
 
-            let vHistogram = d3.histogram()
-                .value(function (aItem) { return aItem.pageTime })
-                .domain(vXAxis.domain())
-                // FIXME: customizable and dynamic number of bins
-                .thresholds(vXAxis.ticks(10)); // number of bins
-
-            let vBins = vHistogram(vData);
-
             let vYAxis = d3.scaleLinear()
                 .range([vHeight, 0])
-                .domain([0, d3.max(vBins, function(aItem) {
-                    return aItem.length;
-                })]);
+                .domain([0, vDataMax]);
             svg.append("g")
                 .call(d3.axisLeft(vYAxis));
             svg.append("text")
@@ -99,18 +90,18 @@
 
             // Bars
             svg.selectAll("rect")
-                .data(vBins)
+                .data(vData)
                 .enter()
                 .append("rect")
-                    .attr("x", 1)
-                    .attr("transform", function(aItem) {
-                        return "translate(" + vXAxis(aItem.x0) + "," + vYAxis(aItem.length) + ")";
+                    .attr("x", function (aItem) {
+                        return vXAxis(aItem.pageTime);
                     })
-                    .attr("width", function(aItem) {
-                        return vXAxis(aItem.x1) - vXAxis(aItem.x0) -1;
+                    .attr("y", function (aItem) {
+                        return vYAxis(aItem.pageCount);
                     })
+                    .attr("width", vXAxis.bandwidth())
                     .attr("height", function(aItem) {
-                        return vHeight - vYAxis(aItem.length);
+                        return vHeight - vYAxis(aItem.pageCount);
                     })
                     // FIXME: make color customizable
                     .attr("fill", "#69b3a2")

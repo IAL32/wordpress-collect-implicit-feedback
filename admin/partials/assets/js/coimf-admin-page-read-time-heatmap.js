@@ -67,6 +67,7 @@
                     "action_type": "= " + 2,
                     "time_start": ">= '" + vTimeStart.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
                     "time_end": "<= '" + vTimeEnd.format(gCoimf.cJsMYSQLDateTimeFormat) + "'",
+                    "CAST(JSON_EXTRACT(value, \"$.pageTime\") AS int)": "<= " + gCoimf.mSettings.mMaxReadTimeSeconds, 
                 },
                 "groupby": [
                     "hour( time_end )",

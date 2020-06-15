@@ -21,7 +21,7 @@
                     return;
                 }
 
-                if (vPageTime > gCoimf.mMaxReadTimeSeconds) {
+                if (vPageTime > gCoimf.mSettings.mMaxReadTimeSeconds) {
                     return;
                 }
     
