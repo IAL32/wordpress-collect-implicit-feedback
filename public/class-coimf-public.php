@@ -153,6 +153,10 @@ class Public_Handler {
 			$vHTTPReferer = "";
 		}
 
+		if ( ! $vHTTPReferer ) {
+			$vHTTPReferer = "";
+		}
+
 		return $vHTTPReferer;
 	}
 
